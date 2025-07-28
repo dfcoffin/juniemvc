@@ -9,14 +9,14 @@ import java.util.Optional;
  * Service interface for Beer operations.
  */
 public interface BeerService {
-    
+
     /**
      * Get all beers.
      * 
      * @return List of all beers
      */
     List<Beer> getAllBeers();
-    
+
     /**
      * Get a beer by its ID.
      * 
@@ -24,7 +24,7 @@ public interface BeerService {
      * @return Optional containing the beer if found, empty otherwise
      */
     Optional<Beer> getBeerById(Integer id);
-    
+
     /**
      * Save a beer.
      * 
@@ -32,4 +32,21 @@ public interface BeerService {
      * @return The saved beer with updated ID
      */
     Beer saveBeer(Beer beer);
+
+    /**
+     * Update an existing beer.
+     * 
+     * @param id The ID of the beer to update
+     * @param beer The updated beer data
+     * @return Optional containing the updated beer if found and updated, empty otherwise
+     */
+    Optional<Beer> updateBeerById(Integer id, Beer beer);
+
+    /**
+     * Delete a beer by its ID.
+     * 
+     * @param id The ID of the beer to delete
+     * @return true if the beer was found and deleted, false otherwise
+     */
+    boolean deleteBeerById(Integer id);
 }

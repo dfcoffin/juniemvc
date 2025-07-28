@@ -64,4 +64,35 @@ public class BeerController {
     public Beer createBeer(@RequestBody Beer beer) {
         return beerService.saveBeer(beer);
     }
+
+    /**
+     * Update an existing beer.
+     * 
+     * @param id The ID of the beer to update
+     * @param beer The updated beer data
+     * @return ResponseEntity containing the updated beer if found and updated, or 404 Not Found
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Beer> updateBeer(@PathVariable Integer id, @RequestBody Beer beer) {
+        Optional<Beer> updatedBeerOptional = beerService.updateBeerById(id, beer);
+
+        return updatedBeerOptional
+                .map(updatedBeer -> new ResponseEntity<>(updatedBeer, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
+     * Delete a beer by its ID.
+     * 
+     * @param id The ID of the beer to delete
+     * @return ResponseEntity with 204 No Content if deleted, or 404 Not Found
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBeer(@PathVariable Integer id) {
+        boolean deleted = beerService.deleteBeerById(id);
+
+        return deleted ? 
+                new ResponseEntity<>(HttpStatus.NO_CONTENT) : 
+                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

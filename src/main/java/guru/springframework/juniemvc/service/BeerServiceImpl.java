@@ -38,4 +38,26 @@ public class BeerServiceImpl implements BeerService {
     public Beer saveBeer(Beer beer) {
         return beerRepository.save(beer);
     }
+
+    @Override
+    public Optional<Beer> updateBeerById(Integer id, Beer beer) {
+        return beerRepository.findById(id)
+                .map(existingBeer -> {
+                    existingBeer.setBeerName(beer.getBeerName());
+                    existingBeer.setBeerStyle(beer.getBeerStyle());
+                    existingBeer.setUpc(beer.getUpc());
+                    existingBeer.setQuantityOnHand(beer.getQuantityOnHand());
+                    existingBeer.setPrice(beer.getPrice());
+                    return beerRepository.save(existingBeer);
+                });
+    }
+
+    @Override
+    public boolean deleteBeerById(Integer id) {
+        if (beerRepository.existsById(id)) {
+            beerRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }
