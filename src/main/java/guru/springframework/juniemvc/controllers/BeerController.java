@@ -1,7 +1,8 @@
 package guru.springframework.juniemvc.controllers;
 
-import guru.springframework.juniemvc.entities.Beer;
+import guru.springframework.juniemvc.models.BeerDto;
 import guru.springframework.juniemvc.service.BeerService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class BeerController {
      * @return List of all beers
      */
     @GetMapping
-    public List<Beer> getAllBeers() {
+    public List<BeerDto> getAllBeers() {
         return beerService.getAllBeers();
     }
 
@@ -45,8 +46,8 @@ public class BeerController {
      * @return ResponseEntity containing the beer if found, or 404 Not Found
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Beer> getBeerById(@PathVariable Integer id) {
-        Optional<Beer> beerOptional = beerService.getBeerById(id);
+    public ResponseEntity<BeerDto> getBeerById(@PathVariable Integer id) {
+        Optional<BeerDto> beerOptional = beerService.getBeerById(id);
 
         return beerOptional
                 .map(beer -> new ResponseEntity<>(beer, HttpStatus.OK))
@@ -56,25 +57,25 @@ public class BeerController {
     /**
      * Create a new beer.
      * 
-     * @param beer The beer to create
+     * @param beerDto The beer to create
      * @return The created beer with status 201 Created
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Beer createBeer(@RequestBody Beer beer) {
-        return beerService.saveBeer(beer);
+    public BeerDto createBeer(@Valid @RequestBody BeerDto beerDto) {
+        return beerService.saveBeer(beerDto);
     }
 
     /**
      * Update an existing beer.
      * 
      * @param id The ID of the beer to update
-     * @param beer The updated beer data
+     * @param beerDto The updated beer data
      * @return ResponseEntity containing the updated beer if found and updated, or 404 Not Found
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Beer> updateBeer(@PathVariable Integer id, @RequestBody Beer beer) {
-        Optional<Beer> updatedBeerOptional = beerService.updateBeerById(id, beer);
+    public ResponseEntity<BeerDto> updateBeer(@PathVariable Integer id, @Valid @RequestBody BeerDto beerDto) {
+        Optional<BeerDto> updatedBeerOptional = beerService.updateBeerById(id, beerDto);
 
         return updatedBeerOptional
                 .map(updatedBeer -> new ResponseEntity<>(updatedBeer, HttpStatus.OK))

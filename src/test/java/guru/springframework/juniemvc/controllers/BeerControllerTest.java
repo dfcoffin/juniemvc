@@ -1,7 +1,7 @@
 package guru.springframework.juniemvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import guru.springframework.juniemvc.entities.Beer;
+import guru.springframework.juniemvc.models.BeerDto;
 import guru.springframework.juniemvc.service.BeerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -51,16 +52,16 @@ class BeerControllerTest {
     @Autowired
     BeerService beerService;
 
-    Beer testBeer;
+    BeerDto testBeerDto;
 
     @BeforeEach
     void setUp() {
-        testBeer = Beer.builder()
+        testBeerDto = BeerDto.builder()
                 .id(1)
                 .version(1)
                 .beerName("Test Beer")
                 .beerStyle("IPA")
-                .upc("123456")
+                .upc("123456789012")
                 .quantityOnHand(100)
                 .price(new BigDecimal("12.99"))
                 .build();
@@ -68,7 +69,7 @@ class BeerControllerTest {
 
     @Test
     void getAllBeers() throws Exception {
-        given(beerService.getAllBeers()).willReturn(Arrays.asList(testBeer));
+        given(beerService.getAllBeers()).willReturn(Arrays.asList(testBeerDto));
 
         mockMvc.perform(get("/api/v1/beer")
                 .accept(MediaType.APPLICATION_JSON))
@@ -81,7 +82,7 @@ class BeerControllerTest {
 
     @Test
     void getBeerById() throws Exception {
-        given(beerService.getBeerById(1)).willReturn(Optional.of(testBeer));
+        given(beerService.getBeerById(1)).willReturn(Optional.of(testBeerDto));
 
         mockMvc.perform(get("/api/v1/beer/1")
                 .accept(MediaType.APPLICATION_JSON))
@@ -119,25 +120,25 @@ class BeerControllerTest {
 
     @Test
     void createBeer() throws Exception {
-        Beer beerToSave = Beer.builder()
+        BeerDto beerToSave = BeerDto.builder()
                 .beerName("New Beer")
                 .beerStyle("Lager")
-                .upc("654321")
+                .upc("123456789012")
                 .quantityOnHand(50)
                 .price(new BigDecimal("9.99"))
                 .build();
 
-        Beer savedBeer = Beer.builder()
+        BeerDto savedBeerDto = BeerDto.builder()
                 .id(2)
                 .version(1)
                 .beerName("New Beer")
                 .beerStyle("Lager")
-                .upc("654321")
+                .upc("123456789012")
                 .quantityOnHand(50)
                 .price(new BigDecimal("9.99"))
                 .build();
 
-        given(beerService.saveBeer(any(Beer.class))).willReturn(savedBeer);
+        given(beerService.saveBeer(any(BeerDto.class))).willReturn(savedBeerDto);
 
         mockMvc.perform(post("/api/v1/beer")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -148,26 +149,47 @@ class BeerControllerTest {
     }
 
     @Test
+    void createBeerWithValidationError() throws Exception {
+        BeerDto invalidBeerDto = BeerDto.builder()
+                .beerName("") // Invalid: empty name
+                .beerStyle("") // Invalid: empty style
+                .upc("123") // Invalid: too short
+                .quantityOnHand(-1) // Invalid: negative quantity
+                .price(new BigDecimal("-1.00")) // Invalid: negative price
+                .build();
+
+        mockMvc.perform(post("/api/v1/beer")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidBeerDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.beerName").exists())
+                .andExpect(jsonPath("$.beerStyle").exists())
+                .andExpect(jsonPath("$.upc").exists())
+                .andExpect(jsonPath("$.quantityOnHand").exists())
+                .andExpect(jsonPath("$.price").exists());
+    }
+
+    @Test
     void updateBeer() throws Exception {
-        Beer beerToUpdate = Beer.builder()
+        BeerDto beerToUpdate = BeerDto.builder()
                 .beerName("Updated Beer")
                 .beerStyle("Stout")
-                .upc("789012")
+                .upc("123456789012")
                 .quantityOnHand(75)
                 .price(new BigDecimal("14.99"))
                 .build();
 
-        Beer updatedBeer = Beer.builder()
+        BeerDto updatedBeerDto = BeerDto.builder()
                 .id(1)
                 .version(2)
                 .beerName("Updated Beer")
                 .beerStyle("Stout")
-                .upc("789012")
+                .upc("123456789012")
                 .quantityOnHand(75)
                 .price(new BigDecimal("14.99"))
                 .build();
 
-        given(beerService.updateBeerById(anyInt(), any(Beer.class))).willReturn(Optional.of(updatedBeer));
+        given(beerService.updateBeerById(anyInt(), any(BeerDto.class))).willReturn(Optional.of(updatedBeerDto));
 
         mockMvc.perform(put("/api/v1/beer/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -178,27 +200,48 @@ class BeerControllerTest {
                 .andExpect(jsonPath("$.beerName", is("Updated Beer")))
                 .andExpect(jsonPath("$.beerStyle", is("Stout")));
 
-        verify(beerService).updateBeerById(eq(1), any(Beer.class));
+        verify(beerService).updateBeerById(eq(1), any(BeerDto.class));
+    }
+
+    @Test
+    void updateBeerWithValidationError() throws Exception {
+        BeerDto invalidBeerDto = BeerDto.builder()
+                .beerName("") // Invalid: empty name
+                .beerStyle("") // Invalid: empty style
+                .upc("123") // Invalid: too short
+                .quantityOnHand(-1) // Invalid: negative quantity
+                .price(new BigDecimal("-1.00")) // Invalid: negative price
+                .build();
+
+        mockMvc.perform(put("/api/v1/beer/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidBeerDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.beerName").exists())
+                .andExpect(jsonPath("$.beerStyle").exists())
+                .andExpect(jsonPath("$.upc").exists())
+                .andExpect(jsonPath("$.quantityOnHand").exists())
+                .andExpect(jsonPath("$.price").exists());
     }
 
     @Test
     void updateBeerNotFound() throws Exception {
-        Beer beerToUpdate = Beer.builder()
+        BeerDto beerToUpdate = BeerDto.builder()
                 .beerName("Updated Beer")
                 .beerStyle("Stout")
-                .upc("789012")
+                .upc("123456789012")
                 .quantityOnHand(75)
                 .price(new BigDecimal("14.99"))
                 .build();
 
-        given(beerService.updateBeerById(anyInt(), any(Beer.class))).willReturn(Optional.empty());
+        given(beerService.updateBeerById(anyInt(), any(BeerDto.class))).willReturn(Optional.empty());
 
         mockMvc.perform(put("/api/v1/beer/999")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(beerToUpdate)))
                 .andExpect(status().isNotFound());
 
-        verify(beerService).updateBeerById(eq(999), any(Beer.class));
+        verify(beerService).updateBeerById(eq(999), any(BeerDto.class));
     }
 
     @Test
