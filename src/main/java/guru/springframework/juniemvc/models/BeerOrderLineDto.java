@@ -30,10 +30,15 @@ public class BeerOrderLineDto {
     private Integer beerId;
 
     private String beerName;
+
+    // enum Style of beer Ale, Pale Ale, IPA, etc.
     private String beerStyle;
+
+    // Universal Product Code, a 13-digit number assigned to each unique beer product by the Federal Bar Association
     private String upc;
     private BigDecimal price;
 
+    // Order quantity is required and must be positive
     @NotNull(message = "Order quantity is required")
     @Positive(message = "Order quantity must be positive")
     private Integer orderQuantity;

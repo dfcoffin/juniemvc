@@ -1,12 +1,14 @@
 get:
   summary: Get all beer orders
-  description: Returns a list of all beer orders in the system
+  description: |
+    Returns a list of all beer orders in the system.
+    This endpoint retrieves all beer orders with their complete details, including order lines, status, and payment information.
   operationId: getAllBeerOrders
   tags:
     - BeerOrder
   responses:
     '200':
-      description: A list of beer orders
+      description: A list of beer orders successfully retrieved
       content:
         application/json:
           schema:
@@ -18,9 +20,11 @@ get:
               version: 0
               customerRef: "Customer123"
               paymentAmount: 59.94
-              orderStatus: "ALLOCATED"
+              orderStatus: "COMPLETE"
               beerOrderLines:
-                - beerId: 1
+                - id: 1
+                  version: 0
+                  beerId: 1
                   beerName: "Mango Bobs"
                   beerStyle: "IPA"
                   upc: "0631234200036"
@@ -28,7 +32,11 @@ get:
                   orderQuantity: 2
                   quantityAllocated: 2
                   lineStatus: "ALLOCATED"
-                - beerId: 2
+                  createDate: "2023-01-15T12:00:00Z"
+                  updateDate: "2023-01-15T12:00:00Z"
+                - id: 2
+                  version: 0
+                  beerId: 2
                   beerName: "Galaxy Cat"
                   beerStyle: "PALE_ALE"
                   upc: "0631234300019"
@@ -36,23 +44,28 @@ get:
                   orderQuantity: 3
                   quantityAllocated: 3
                   lineStatus: "ALLOCATED"
+                  createDate: "2023-01-15T12:00:00Z"
+                  updateDate: "2023-01-15T12:00:00Z"
               createDate: "2023-01-15T12:00:00Z"
               updateDate: "2023-01-15T12:00:00Z"
     '400':
-      description: Bad request
+      description: Bad request - Invalid request format or parameters
     '401':
-      description: Unauthorized
+      description: Unauthorized - Authentication required
     '403':
-      description: Forbidden
+      description: Forbidden - Insufficient permissions to access beer orders
 
 post:
   summary: Create a new beer order
-  description: Creates a new beer order in the system
+  description: |
+    Creates a new beer order in the system.
+    This endpoint requires a valid beer order with customer reference, payment amount, and at least one beer order line.
+    The system will automatically populate additional information such as beer details, order status, and timestamps.
   operationId: createBeerOrder
   tags:
     - BeerOrder
   requestBody:
-    description: Beer order to create
+    description: Beer order to create with required fields
     required: true
     content:
       application/json:
@@ -68,7 +81,7 @@ post:
               orderQuantity: 3
   responses:
     '201':
-      description: Beer order created successfully
+      description: Beer order created successfully with generated ID and system-populated fields
       content:
         application/json:
           schema:
@@ -107,8 +120,20 @@ post:
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T12:00:00Z"
     '400':
-      description: Invalid input
+      description: Invalid input - Request validation failed
       content:
         application/json:
           schema:
             $ref: '../components/schemas/Problem.yaml'
+          example:
+            type: "https://example.com/problems/validation-error"
+            title: "Validation Error"
+            status: 400
+            detail: "The beer order request contains validation errors"
+            errors:
+              - field: "customerRef"
+                message: "Customer reference is required"
+              - field: "paymentAmount"
+                message: "Payment amount must be positive"
+              - field: "beerOrderLines"
+                message: "Order must contain at least one beer"

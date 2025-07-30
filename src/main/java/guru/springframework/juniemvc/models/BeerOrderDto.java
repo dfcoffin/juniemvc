@@ -37,13 +37,16 @@ public class BeerOrderDto {
     @Size(max = 255)
     private String customerRef;
 
+    //Payment must have no more than 10 digits and 2 decimal places
     @NotNull(message = "Payment amount is required")
     @Positive(message = "Payment amount must be positive")
     @Digits(integer = 10, fraction = 2, message = "Payment amount must have at most 10 digits and 2 decimal places")
     private BigDecimal paymentAmount;
 
+    // ENUM Status of the order, NEW, PAID, CANCELLED, INPROCESS, COMPLETE
     private OrderStatus orderStatus;
 
+    // The order must have at least one beer line
     @Valid
     @NotEmpty(message = "Order must contain at least one beer")
     @Builder.Default

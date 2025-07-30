@@ -6,16 +6,20 @@ parameters:
     schema:
       type: integer
       format: int32
+      minimum: 1
+    example: 1
 
 get:
   summary: Get a beer order by ID
-  description: Returns a single beer order by its ID
+  description: |
+    Returns a single beer order by its ID.
+    This endpoint retrieves complete details of a specific beer order, including order lines, status, and payment information.
   operationId: getBeerOrderById
   tags:
     - BeerOrder
   responses:
     '200':
-      description: Beer order found
+      description: Beer order found and returned successfully
       content:
         application/json:
           schema:
@@ -25,7 +29,7 @@ get:
             version: 0
             customerRef: "Customer123"
             paymentAmount: 59.94
-            orderStatus: "ALLOCATED"
+            orderStatus: "COMPLETE"
             beerOrderLines:
               - id: 1
                 version: 0
@@ -54,16 +58,19 @@ get:
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T12:00:00Z"
     '404':
-      description: Beer order not found
+      description: Beer order not found - No beer order exists with the specified ID
 
 put:
   summary: Update a beer order
-  description: Updates an existing beer order by its ID
+  description: |
+    Updates an existing beer order by its ID.
+    This endpoint requires a valid beer order with customer reference, payment amount, and at least one beer order line.
+    The system will preserve the order ID and update other fields as specified in the request.
   operationId: updateBeerOrder
   tags:
     - BeerOrder
   requestBody:
-    description: Updated beer order information
+    description: Updated beer order information with required fields
     required: true
     content:
       application/json:
@@ -79,7 +86,7 @@ put:
               orderQuantity: 3
   responses:
     '200':
-      description: Beer order updated successfully
+      description: Beer order updated successfully with preserved ID and updated fields
       content:
         application/json:
           schema:
@@ -89,7 +96,7 @@ put:
             version: 1
             customerRef: "Customer123-Updated"
             paymentAmount: 59.94
-            orderStatus: "ALLOCATED"
+            orderStatus: "COMPLETE"
             beerOrderLines:
               - id: 1
                 version: 0
@@ -118,22 +125,39 @@ put:
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T13:30:00Z"
     '400':
-      description: Invalid input
+      description: Invalid input - Request validation failed
       content:
         application/json:
           schema:
             $ref: '../components/schemas/Problem.yaml'
+          example:
+            type: "https://example.com/problems/validation-error"
+            title: "Validation Error"
+            status: 400
+            detail: "The beer order request contains validation errors"
+            errors:
+              - field: "customerRef"
+                message: "Customer reference is required"
+              - field: "paymentAmount"
+                message: "Payment amount must be positive"
+              - field: "beerOrderLines"
+                message: "Order must contain at least one beer"
     '404':
-      description: Beer order not found
+      description: Beer order not found - No beer order exists with the specified ID
 
 delete:
   summary: Delete a beer order
-  description: Deletes a beer order by its ID
+  description: |
+    Deletes a beer order by its ID.
+    This operation permanently removes the beer order and all its associated order lines from the system.
+    Once deleted, the order cannot be recovered.
   operationId: deleteBeerOrder
   tags:
     - BeerOrder
   responses:
     '204':
-      description: Beer order deleted successfully
+      description: Beer order deleted successfully - The order has been removed from the system
     '404':
-      description: Beer order not found
+      description: Beer order not found - No beer order exists with the specified ID
+    '409':
+      description: Conflict - The beer order cannot be deleted in its current state (e.g., already shipped)
