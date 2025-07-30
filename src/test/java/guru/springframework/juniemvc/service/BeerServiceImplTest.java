@@ -42,14 +42,14 @@ class BeerServiceImplTest {
     @BeforeEach
     void setUp() {
         testBeer = Beer.builder()
-                .id(1)
-                .version(1)
                 .beerName("Test Beer")
                 .beerStyle("IPA")
                 .upc("123456789012")
                 .quantityOnHand(100)
                 .price(new BigDecimal("12.99"))
                 .build();
+        testBeer.setId(1);
+        testBeer.setVersion(1);
 
         testBeerDto = BeerDto.builder()
                 .id(1)
@@ -128,14 +128,14 @@ class BeerServiceImplTest {
                 .build();
 
         Beer savedBeer = Beer.builder()
-                .id(2)
-                .version(1)
                 .beerName("New Beer")
                 .beerStyle("Lager")
                 .upc("123456789012")
                 .quantityOnHand(50)
                 .price(new BigDecimal("9.99"))
                 .build();
+        savedBeer.setId(2);
+        savedBeer.setVersion(1);
 
         BeerDto savedBeerDto = BeerDto.builder()
                 .id(2)
@@ -173,24 +173,24 @@ class BeerServiceImplTest {
                 .build();
 
         Beer existingBeer = Beer.builder()
-                .id(1)
-                .version(1)
                 .beerName("Test Beer")
                 .beerStyle("IPA")
                 .upc("123456789012")
                 .quantityOnHand(100)
                 .price(new BigDecimal("12.99"))
                 .build();
+        existingBeer.setId(1);
+        existingBeer.setVersion(1);
 
         Beer updatedBeer = Beer.builder()
-                .id(1)
-                .version(1)
                 .beerName("Updated Beer")
                 .beerStyle("Stout")
                 .upc("123456789012")
                 .quantityOnHand(75)
                 .price(new BigDecimal("14.99"))
                 .build();
+        updatedBeer.setId(1);
+        updatedBeer.setVersion(1);
 
         BeerDto updatedBeerDto = BeerDto.builder()
                 .id(1)
