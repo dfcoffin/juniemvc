@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BeerDto {
+
+    //read only
     private Integer id;
     private Integer version;
 
@@ -19,9 +21,11 @@ public class BeerDto {
     @Size(min = 3, max = 50)
     private String beerName;
 
+    // style of beer Ale, Pale Ale, IPA, etc.
     @NotBlank(message = "Beer style is required")
     private String beerStyle;
 
+    // Universal Product Code, a 13-digit number assigned to each unique beer product by the Federal Bar Association
     @NotBlank(message = "UPC is required")
     @Size(min = 12, max = 13)
     private String upc;
@@ -35,6 +39,9 @@ public class BeerDto {
     @Digits(integer = 6, fraction = 2)
     private BigDecimal price;
 
+    //read only created date
     private LocalDateTime createDate;
+
+    //read only updated date
     private LocalDateTime updateDate;
 }

@@ -28,6 +28,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BeerOrderDto {
+
+    //read only
     private Integer id;
     private Integer version;
 
@@ -47,6 +49,9 @@ public class BeerOrderDto {
     @Builder.Default
     private Set<BeerOrderLineDto> beerOrderLines = new HashSet<>();
 
+    //read only created date
     private LocalDateTime createDate;
+
+    //read only updated date
     private LocalDateTime updateDate;
 }

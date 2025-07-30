@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BeerOrderLineDto {
+
+    //read only
     private Integer id;
     private Integer version;
 
@@ -40,6 +42,9 @@ public class BeerOrderLineDto {
 
     private OrderLineStatus lineStatus;
 
+    //read only created date
     private LocalDateTime createDate;
+
+    //read only updated date
     private LocalDateTime updateDate;
 }

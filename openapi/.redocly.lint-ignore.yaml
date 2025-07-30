@@ -1,0 +1,24 @@
+# This file instructs Redocly's linter to ignore the rules contained in this file.
+# See https://redocly.com/docs/cli/configuration/rules/
+
+openapi\paths\api_v1_beer.yaml:
+  security-defined: # Ignore security-defined rule for this file
+    - '#/get'
+    - '#/post'
+
+openapi\paths\api_v1_beer_{id}.yaml:
+  security-defined: # Ignore security-defined rule for this file
+    - '#/get'
+    - '#/put'
+    - '#/delete'
+
+openapi\paths\api_v1_beerorder.yaml:
+  security-defined: # Ignore security-defined rule for this file
+    - '#/get'
+    - '#/post'
+
+openapi\paths\api_v1_beerorder_{id}.yaml:
+  security-defined: # Ignore security-defined rule for this file
+    - '#/get'
+    - '#/put'
+    - '#/delete'

@@ -54,6 +54,10 @@ tags:
     description: "Example operations for retrieving information."
   - name: Tag
     description: "This is a tag description."
+  - name: Beer
+    description: "Operations for managing beers."
+  - name: BeerOrder
+    description: "Operations for managing beer orders."
 x-tagGroups:
   - name: General
     tags:
@@ -63,6 +67,10 @@ x-tagGroups:
   - name: Administration
     tags:
       - Admin
+  - name: Beer Management
+    tags:
+      - Beer
+      - BeerOrder
 servers:
   - url: https://{tenant}/api/v1
     variables:
@@ -83,6 +91,14 @@ paths:
     $ref: paths/pathItemWithExamples.yaml
   '/echo':
     $ref: 'paths/echo.yaml'
+  '/api/v1/beer':
+    $ref: 'paths/api_v1_beer.yaml'
+  '/api/v1/beer/{id}':
+    $ref: 'paths/api_v1_beer_{id}.yaml'
+  '/api/v1/beerorder':
+    $ref: 'paths/api_v1_beerorder.yaml'
+  '/api/v1/beerorder/{id}':
+    $ref: 'paths/api_v1_beerorder_{id}.yaml'
 components:
   securitySchemes:
     main_auth:

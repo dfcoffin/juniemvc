@@ -1,0 +1,83 @@
+get:
+  summary: Get all beers
+  description: Returns a list of all beers in the system
+  operationId: getAllBeers
+  tags:
+    - Beer
+  responses:
+    '200':
+      description: A list of beers
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../components/schemas/BeerDto.yaml'
+          example:
+            - id: 1
+              version: 0
+              beerName: "Mango Bobs"
+              beerStyle: "IPA"
+              upc: "0631234200036"
+              quantityOnHand: 122
+              price: 12.99
+              createDate: "2023-01-15T12:00:00Z"
+              updateDate: "2023-01-15T12:00:00Z"
+            - id: 2
+              version: 0
+              beerName: "Galaxy Cat"
+              beerStyle: "PALE_ALE"
+              upc: "0631234300019"
+              quantityOnHand: 392
+              price: 11.99
+              createDate: "2023-01-15T12:00:00Z"
+              updateDate: "2023-01-15T12:00:00Z"
+    '400':
+      description: Bad request
+    '401':
+      description: Unauthorized
+    '403':
+      description: Forbidden
+
+post:
+  summary: Create a new beer
+  description: Creates a new beer in the system
+  operationId: createBeer
+  tags:
+    - Beer
+  requestBody:
+    description: Beer to create
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/BeerDto.yaml'
+        example:
+          beerName: "Mango Bobs"
+          beerStyle: "IPA"
+          upc: "0631234200036"
+          quantityOnHand: 122
+          price: 12.99
+  responses:
+    '201':
+      description: Beer created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/BeerDto.yaml'
+          example:
+            id: 1
+            version: 0
+            beerName: "Mango Bobs"
+            beerStyle: "IPA"
+            upc: "0631234200036"
+            quantityOnHand: 122
+            price: 12.99
+            createDate: "2023-01-15T12:00:00Z"
+            updateDate: "2023-01-15T12:00:00Z"
+    '400':
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/Problem.yaml'
