@@ -210,3 +210,39 @@ logger.atDebug()
 * **Multiple outputs and formats:** Direct logs to consoles, rolling files, databases, or remote systems, and choose formats like JSON for seamless ingestion into ELK, Loki, or other log-analysis tools.
 
 * **Better tooling and analysis:** Structured logs and controlled log levels make it easier to filter noise, automate alerts, and visualize application behavior in real time.
+
+## 16. OpenAPI Documentation
+* Use OpenAPI Specification to document your REST APIs.
+* Organize the specification into multiple files for better maintainability.
+* Follow consistent file naming conventions for paths and components.
+* Use npm commands to test, build, and preview the documentation.
+
+**Explanation:**
+
+* **API Documentation Structure:** The OpenAPI specification is organized with a main `openapi.yaml` file that references other files for paths and components. This modular approach makes the documentation more maintainable and easier to navigate.
+
+* **File Naming Conventions:**
+  * **Path Operations:** Files for path operations are named after the API path they document, with special characters handled in specific ways:
+    * Regular paths: `/echo` → `paths/echo.yaml`
+    * Paths with parameters: `/users/{username}` → `paths/users_{username}.yaml`
+  * **Components:** Component files are organized by type and named after the component they define:
+    * Schemas: `components/schemas/User.yaml`
+    * Headers: `components/headers/ExpiresAfter.yaml`
+    * Other component types follow the same pattern
+
+* **Component Definitions:**
+  * Components are referenced using the `$ref` keyword with relative paths
+  * Schema components can reference other schemas using relative paths (e.g., `./Email.yaml`)
+  * Headers, parameters, and other components follow the same reference pattern
+  * Components are organized in directories by type (schemas, headers, parameters, etc.)
+
+* **Testing, Building, and Previewing:**
+  * **Testing:** Run `npm run test` to lint the OpenAPI specification and check for errors
+  * **Building:** Run `npm run build` to bundle the OpenAPI specification into a single file (`dist/bundle.yaml`)
+  * **Previewing:** Run `npm run start` to start a local server that renders the documentation for preview
+
+* **Benefits:**
+  * **Maintainability:** Breaking the specification into multiple files makes it easier to manage and update
+  * **Collaboration:** Multiple team members can work on different parts of the API documentation simultaneously
+  * **Consistency:** Following naming conventions ensures a consistent structure that's easy to navigate
+  * **Validation:** Regular testing with `npm test` helps catch errors early
