@@ -1,14 +1,16 @@
 get:
+  tags:
+    - BeerOrder
   summary: Get all beer orders
   description: |
     Returns a list of all beer orders in the system.
     This endpoint retrieves all beer orders with their complete details, including order lines, status, and payment information.
   operationId: getAllBeerOrders
-  tags:
-    - BeerOrder
+  security:
+    - api_key: [ ]
   responses:
     '200':
-      description: A list of beer orders successfully retrieved
+      description: Successfully retrieved the list of beer orders
       content:
         application/json:
           schema:
@@ -56,16 +58,18 @@ get:
       description: Forbidden - Insufficient permissions to access beer orders
 
 post:
+  tags:
+    - BeerOrder
   summary: Create a new beer order
   description: |
     Creates a new beer order in the system.
     This endpoint requires a valid beer order with customer reference, payment amount, and at least one beer order line.
     The system will automatically populate additional information such as beer details, order status, and timestamps.
   operationId: createBeerOrder
-  tags:
-    - BeerOrder
+  security:
+    - api_key: [ ]
   requestBody:
-    description: Beer order to create with required fields
+    description: Beer order object to be created
     required: true
     content:
       application/json:
@@ -120,20 +124,6 @@ post:
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T12:00:00Z"
     '400':
-      description: Invalid input - Request validation failed
-      content:
-        application/json:
-          schema:
-            $ref: '../components/schemas/Problem.yaml'
-          example:
-            type: "https://example.com/problems/validation-error"
-            title: "Validation Error"
-            status: 400
-            detail: "The beer order request contains validation errors"
-            errors:
-              - field: "customerRef"
-                message: "Customer reference is required"
-              - field: "paymentAmount"
-                message: "Payment amount must be positive"
-              - field: "beerOrderLines"
-                message: "Order must contain at least one beer"
+      description: "Bad request - validation error"
+    '401':
+      description: "Unauthorized"

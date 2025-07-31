@@ -8,14 +8,16 @@ parameters:
       format: int32
 
 get:
-  summary: Get a beer by ID
-  description: Returns a single beer by its ID
-  operationId: getBeerById
   tags:
     - Beer
+  summary: Get a beer by ID
+  description: Returns a single beer identified by its ID
+  operationId: getBeerById
+  security:
+    - api_key: [ ]
   responses:
     '200':
-      description: Beer found
+      description: Successfully retrieved the beer
       content:
         application/json:
           schema:
@@ -30,23 +32,30 @@ get:
             price: 12.99
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T12:00:00Z"
+    '400':
+      description: "Bad request"
+    '401':
+      description: "Unauthorized"
     '404':
-      description: Beer not found
+      description: "Beer not found"
 
 put:
-  summary: Update a beer
-  description: Updates an existing beer by its ID
-  operationId: updateBeer
   tags:
     - Beer
+  summary: Update a beer
+  description: Updates an existing beer identified by its ID. The ID in the path must match the ID in the request body
+  operationId: updateBeer
+  security:
+    - api_key: [ ]
   requestBody:
-    description: Updated beer information
+    description: Updated beer object
     required: true
     content:
       application/json:
         schema:
           $ref: '../components/schemas/BeerDto.yaml'
         example:
+          id: 1
           beerName: "Mango Bobs"
           beerStyle: "IPA"
           upc: "0631234200036"
@@ -54,7 +63,7 @@ put:
           price: 13.99
   responses:
     '200':
-      description: Beer updated successfully
+      description: Successfully updated the beer
       content:
         application/json:
           schema:
@@ -70,22 +79,26 @@ put:
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T13:30:00Z"
     '400':
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '../components/schemas/Problem.yaml'
+      description: "Bad request - validation error"
+    '401':
+      description: "Unauthorized"
     '404':
-      description: Beer not found
+      description: "Beer not found"
 
 delete:
-  summary: Delete a beer
-  description: Deletes a beer by its ID
-  operationId: deleteBeer
   tags:
     - Beer
+  summary: Delete a beer
+  description: Deletes a beer identified by its ID
+  operationId: deleteBeer
+  security:
+    - api_key: []
   responses:
     '204':
-      description: Beer deleted successfully
+      description: "Successfully deleted the beer"
+    '400':
+      description: "Bad request"
+    '401':
+      description: "Unauthorized"
     '404':
-      description: Beer not found
+      description: "Beer not found"

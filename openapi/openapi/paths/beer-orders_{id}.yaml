@@ -1,7 +1,7 @@
 parameters:
   - name: id
     in: path
-    description: ID of the beer order to operate on
+    description: ID of the beer order
     required: true
     schema:
       type: integer
@@ -10,16 +10,18 @@ parameters:
     example: 1
 
 get:
+  tags:
+    - BeerOrder
   summary: Get a beer order by ID
   description: |
     Returns a single beer order by its ID.
     This endpoint retrieves complete details of a specific beer order, including order lines, status, and payment information.
   operationId: getBeerOrderById
-  tags:
-    - BeerOrder
+  security:
+    - api_key: [ ]
   responses:
     '200':
-      description: Beer order found and returned successfully
+      description: Successfully retrieved the beer order
       content:
         application/json:
           schema:
@@ -58,35 +60,45 @@ get:
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T12:00:00Z"
     '404':
-      description: Beer order not found - No beer order exists with the specified ID
+      description: "Beer order not found"
+    '401':
+      description: "Unauthorized"
 
 put:
+  tags:
+    - BeerOrder
   summary: Update a beer order
   description: |
     Updates an existing beer order by its ID.
     This endpoint requires a valid beer order with customer reference, payment amount, and at least one beer order line.
     The system will preserve the order ID and update other fields as specified in the request.
   operationId: updateBeerOrder
-  tags:
-    - BeerOrder
+  security:
+    - api_key: [ ]
   requestBody:
-    description: Updated beer order information with required fields
+    description: Beer order object with updated information
     required: true
     content:
       application/json:
         schema:
           $ref: '../components/schemas/BeerOrderDto.yaml'
         example:
+          id: 1
+          version: 0
           customerRef: "Customer123-Updated"
           paymentAmount: 59.94
           beerOrderLines:
-            - beerId: 1
+            - id: 1
+              beerId: 1
+              beerName: "Mango Bobs"
+              beerStyle: "IPA"
+              upc: "0631234200036"
               orderQuantity: 2
-            - beerId: 2
-              orderQuantity: 3
+              quantityAllocated: 10
+              lineStatus: "NEW"
   responses:
     '200':
-      description: Beer order updated successfully with preserved ID and updated fields
+      description: Successfully updated the beer order
       content:
         application/json:
           schema:
@@ -125,39 +137,27 @@ put:
             createDate: "2023-01-15T12:00:00Z"
             updateDate: "2023-01-15T13:30:00Z"
     '400':
-      description: Invalid input - Request validation failed
-      content:
-        application/json:
-          schema:
-            $ref: '../components/schemas/Problem.yaml'
-          example:
-            type: "https://example.com/problems/validation-error"
-            title: "Validation Error"
-            status: 400
-            detail: "The beer order request contains validation errors"
-            errors:
-              - field: "customerRef"
-                message: "Customer reference is required"
-              - field: "paymentAmount"
-                message: "Payment amount must be positive"
-              - field: "beerOrderLines"
-                message: "Order must contain at least one beer"
+      description: "Bad request - validation error"
     '404':
-      description: Beer order not found - No beer order exists with the specified ID
+      description: "Beer order not found"
+    '401':
+      description: "Unauthorized"
 
 delete:
+  tags:
+    - BeerOrder
   summary: Delete a beer order
   description: |
     Deletes a beer order by its ID.
     This operation permanently removes the beer order and all its associated order lines from the system.
     Once deleted, the order cannot be recovered.
   operationId: deleteBeerOrder
-  tags:
-    - BeerOrder
+  security:
+    - api_key: []
   responses:
     '204':
-      description: Beer order deleted successfully - The order has been removed from the system
+      description: "Successfully deleted the beer order"
     '404':
-      description: Beer order not found - No beer order exists with the specified ID
-    '409':
-      description: Conflict - The beer order cannot be deleted in its current state (e.g., already shipped)
+      description: "Beer order not found"
+    '401':
+      description: "Unauthorized"

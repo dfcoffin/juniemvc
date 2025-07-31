@@ -33,13 +33,7 @@ properties:
   orderStatus:
     type: string
     description: Status of the order (system-managed)
-    enum:
-      - NEW
-      - PAID
-      - CANCELLED
-      - INPROCESS
-      - COMPLETE
-    example: "COMPLETE"
+    example: "NEW"
   beerOrderLines:
     type: array
     description: Line items in the beer order (required, must contain at least one beer)

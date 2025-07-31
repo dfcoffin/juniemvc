@@ -49,16 +49,7 @@ properties:
   lineStatus:
     type: string
     description: Status of the order line
-    enum:
-      - NEW
-      - PENDING
-      - ALLOCATED
-      - PICKED
-      - SHIPPED
-      - DELIVERED
-      - CANCELLED
-      - PENDING_INVENTORY
-    example: "ALLOCATED"
+    example: "NEW"
   createDate:
     type: string
     format: date-time
