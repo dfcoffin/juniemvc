@@ -3,6 +3,7 @@ package guru.springframework.juniemvc.repositories;
 import guru.springframework.juniemvc.entities.Beer;
 import guru.springframework.juniemvc.entities.BeerOrder;
 import guru.springframework.juniemvc.entities.BeerOrderLine;
+import guru.springframework.juniemvc.entities.Customer;
 import guru.springframework.juniemvc.entities.OrderLineStatus;
 import guru.springframework.juniemvc.entities.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,20 @@ class BeerOrderRepositoryTest {
     @Autowired
     BeerOrderLineRepository beerOrderLineRepository;
 
+    @Autowired
+    CustomerRepository customerRepository;
+
     private Beer testBeer;
+
+    private Customer createTestCustomer(String name) {
+        return Customer.builder()
+                .name(name)
+                .addressLine1("123 Test St")
+                .city("Test City")
+                .state("TS")
+                .zipCode("12345")
+                .build();
+    }
 
     @BeforeEach
     void setUp() {
@@ -49,8 +63,11 @@ class BeerOrderRepositoryTest {
     @Test
     void testSaveBeerOrder() {
         // Given
+        Customer customer = createTestCustomer("Test Customer");
+        customer = customerRepository.save(customer);
+
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(customer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -61,15 +78,18 @@ class BeerOrderRepositoryTest {
         // Then
         assertThat(savedBeerOrder).isNotNull();
         assertThat(savedBeerOrder.getId()).isNotNull();
-        assertThat(savedBeerOrder.getCustomerRef()).isEqualTo("Test Customer");
+        assertThat(savedBeerOrder.getCustomer().getName()).isEqualTo("Test Customer");
         assertThat(savedBeerOrder.getOrderStatus()).isEqualTo(OrderStatus.NEW);
     }
 
     @Test
     void testGetBeerOrderById() {
         // Given
+        Customer customer = createTestCustomer("Test Customer");
+        customer = customerRepository.save(customer);
+
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(customer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -81,34 +101,43 @@ class BeerOrderRepositoryTest {
         // Then
         assertThat(fetchedBeerOrderOptional).isPresent();
         BeerOrder fetchedBeerOrder = fetchedBeerOrderOptional.get();
-        assertThat(fetchedBeerOrder.getCustomerRef()).isEqualTo("Test Customer");
+        assertThat(fetchedBeerOrder.getCustomer().getName()).isEqualTo("Test Customer");
     }
 
     @Test
     void testUpdateBeerOrder() {
         // Given
+        Customer originalCustomer = createTestCustomer("Original Customer");
+        originalCustomer = customerRepository.save(originalCustomer);
+
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Original Customer")
+                .customer(originalCustomer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
         BeerOrder savedBeerOrder = beerOrderRepository.save(beerOrder);
 
         // When
-        savedBeerOrder.setCustomerRef("Updated Customer");
+        Customer updatedCustomer = createTestCustomer("Updated Customer");
+        updatedCustomer = customerRepository.save(updatedCustomer);
+
+        savedBeerOrder.setCustomer(updatedCustomer);
         savedBeerOrder.setOrderStatus(OrderStatus.PROCESSING);
         BeerOrder updatedBeerOrder = beerOrderRepository.save(savedBeerOrder);
 
         // Then
-        assertThat(updatedBeerOrder.getCustomerRef()).isEqualTo("Updated Customer");
+        assertThat(updatedBeerOrder.getCustomer().getName()).isEqualTo("Updated Customer");
         assertThat(updatedBeerOrder.getOrderStatus()).isEqualTo(OrderStatus.PROCESSING);
     }
 
     @Test
     void testDeleteBeerOrder() {
         // Given
+        Customer customer = createTestCustomer("Delete Me");
+        customer = customerRepository.save(customer);
+
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Delete Me")
+                .customer(customer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -125,14 +154,20 @@ class BeerOrderRepositoryTest {
     @Test
     void testListBeerOrders() {
         // Given
+        Customer customer1 = createTestCustomer("Customer One");
+        customer1 = customerRepository.save(customer1);
+
+        Customer customer2 = createTestCustomer("Customer Two");
+        customer2 = customerRepository.save(customer2);
+
         BeerOrder beerOrder1 = BeerOrder.builder()
-                .customerRef("Customer One")
+                .customer(customer1)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
 
         BeerOrder beerOrder2 = BeerOrder.builder()
-                .customerRef("Customer Two")
+                .customer(customer2)
                 .paymentAmount(new BigDecimal("200.00"))
                 .orderStatus(OrderStatus.PENDING)
                 .build();
@@ -151,8 +186,11 @@ class BeerOrderRepositoryTest {
     @Test
     void testCascadeSaveWithBeerOrderLines() {
         // Given
+        Customer customer = createTestCustomer("Test Customer");
+        customer = customerRepository.save(customer);
+
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(customer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -185,8 +223,11 @@ class BeerOrderRepositoryTest {
     @Test
     void testCascadeDeleteWithBeerOrderLines() {
         // Given
+        Customer customer = createTestCustomer("Test Customer");
+        customer = customerRepository.save(customer);
+
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(customer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();

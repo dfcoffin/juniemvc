@@ -3,11 +3,9 @@ package guru.springframework.juniemvc.models;
 import guru.springframework.juniemvc.entities.OrderStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,9 +31,9 @@ public class BeerOrderDto {
     private Integer id;
     private Integer version;
 
-    @NotBlank(message = "Customer reference is required")
-    @Size(max = 255)
-    private String customerRef;
+    @Valid
+    @NotNull(message = "Customer is required")
+    private CustomerDto customer;
 
     //Payment must have no more than 10 digits and 2 decimal places
     @NotNull(message = "Payment amount is required")

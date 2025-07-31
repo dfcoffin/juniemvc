@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 /**
  * Mapper for converting between BeerOrder entities and DTOs.
  */
-@Mapper(uses = {BeerOrderLineMapper.class})
+@Mapper(uses = {BeerOrderLineMapper.class, CustomerMapper.class})
 public interface BeerOrderMapper {
 
     BeerOrderDto beerOrderToBeerOrderDto(BeerOrder beerOrder);

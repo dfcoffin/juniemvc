@@ -6,6 +6,7 @@ import guru.springframework.juniemvc.entities.OrderLineStatus;
 import guru.springframework.juniemvc.entities.OrderStatus;
 import guru.springframework.juniemvc.models.BeerOrderDto;
 import guru.springframework.juniemvc.models.BeerOrderLineDto;
+import guru.springframework.juniemvc.models.CustomerDto;
 import guru.springframework.juniemvc.repositories.BeerOrderRepository;
 import guru.springframework.juniemvc.repositories.BeerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +52,21 @@ class BeerOrderIntegrationTest {
 
     private Beer testBeer;
 
+    /**
+     * Helper method to create a CustomerDto with a given name
+     */
+    private CustomerDto createTestCustomerDto(String name) {
+        return CustomerDto.builder()
+                .name(name)
+                .email(name.toLowerCase().replace(' ', '.') + "@example.com")
+                .phoneNumber("555-123-4567")
+                .addressLine1("123 Test St")
+                .city("Test City")
+                .state("TS")
+                .zipCode("12345")
+                .build();
+    }
+
     @BeforeEach
     void setUp() {
         // Clean up any existing test data
@@ -84,8 +100,10 @@ class BeerOrderIntegrationTest {
         Set<BeerOrderLineDto> lineDtos = new HashSet<>();
         lineDtos.add(lineDto);
 
+        CustomerDto testCustomerDto = createTestCustomerDto("Integration Test Customer");
+
         BeerOrderDto beerOrderDtoToSave = BeerOrderDto.builder()
-                .customerRef("Integration Test Customer")
+                .customer(testCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .beerOrderLines(lineDtos)
                 .build();
@@ -95,7 +113,7 @@ class BeerOrderIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(beerOrderDtoToSave)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.customerRef", is("Integration Test Customer")))
+                .andExpect(jsonPath("$.customer.name", is("Integration Test Customer")))
                 .andExpect(jsonPath("$.orderStatus", is("NEW")))
                 .andReturn();
 
@@ -113,7 +131,7 @@ class BeerOrderIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(orderId)))
-                .andExpect(jsonPath("$.customerRef", is("Integration Test Customer")))
+                .andExpect(jsonPath("$.customer.name", is("Integration Test Customer")))
                 .andExpect(jsonPath("$.orderStatus", is("NEW")))
                 .andExpect(jsonPath("$.beerOrderLines", hasSize(1)))
                 .andExpect(jsonPath("$.beerOrderLines[0].beerId", is(testBeer.getId())));
@@ -132,8 +150,10 @@ class BeerOrderIntegrationTest {
         Set<BeerOrderLineDto> lineDtos = new HashSet<>();
         lineDtos.add(lineDto);
 
+        CustomerDto testCustomerDto = createTestCustomerDto("Integration Test Customer");
+
         BeerOrderDto beerOrderDtoToSave = BeerOrderDto.builder()
-                .customerRef("Integration Test Customer")
+                .customer(testCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .beerOrderLines(lineDtos)
                 .build();
@@ -160,8 +180,10 @@ class BeerOrderIntegrationTest {
         Set<BeerOrderLineDto> updatedLineDtos = new HashSet<>();
         updatedLineDtos.add(updatedLineDto);
 
+        CustomerDto updatedCustomerDto = createTestCustomerDto("Updated Integration Test Customer");
+
         BeerOrderDto beerOrderDtoToUpdate = BeerOrderDto.builder()
-                .customerRef("Updated Integration Test Customer")
+                .customer(updatedCustomerDto)
                 .paymentAmount(new BigDecimal("259.80"))
                 .orderStatus(OrderStatus.PROCESSING)
                 .beerOrderLines(updatedLineDtos)
@@ -173,7 +195,7 @@ class BeerOrderIntegrationTest {
                 .content(objectMapper.writeValueAsString(beerOrderDtoToUpdate)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(orderId)))
-                .andExpect(jsonPath("$.customerRef", is("Updated Integration Test Customer")))
+                .andExpect(jsonPath("$.customer.name", is("Updated Integration Test Customer")))
                 .andExpect(jsonPath("$.orderStatus", is("PROCESSING")))
                 .andExpect(jsonPath("$.beerOrderLines", hasSize(1)))
                 .andExpect(jsonPath("$.beerOrderLines[0].orderQuantity", is(20)));
@@ -199,8 +221,10 @@ class BeerOrderIntegrationTest {
         Set<BeerOrderLineDto> lineDtos = new HashSet<>();
         lineDtos.add(lineDto);
 
+        CustomerDto testCustomerDto = createTestCustomerDto("Integration Test Customer");
+
         BeerOrderDto beerOrderDtoToSave = BeerOrderDto.builder()
-                .customerRef("Integration Test Customer")
+                .customer(testCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .beerOrderLines(lineDtos)
                 .build();
@@ -217,7 +241,7 @@ class BeerOrderIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].customerRef", is("Integration Test Customer")));
+                .andExpect(jsonPath("$[0].customer.name", is("Integration Test Customer")));
     }
 
     @Test
@@ -225,8 +249,16 @@ class BeerOrderIntegrationTest {
     @Rollback
     void testValidationErrors() throws Exception {
         // Create an invalid beer order DTO
+        CustomerDto invalidCustomerDto = CustomerDto.builder()
+                .name("") // Invalid: empty name
+                .addressLine1("") // Invalid: empty address line 1
+                .city("") // Invalid: empty city
+                .state("") // Invalid: empty state
+                .zipCode("") // Invalid: empty zip code
+                .build();
+
         BeerOrderDto invalidBeerOrderDto = BeerOrderDto.builder()
-                .customerRef("") // Invalid: empty customer reference
+                .customer(invalidCustomerDto) // Invalid: customer with empty required fields
                 .paymentAmount(new BigDecimal("-1.00")) // Invalid: negative payment amount
                 .beerOrderLines(new HashSet<>()) // Invalid: empty beer order lines
                 .build();
@@ -236,8 +268,13 @@ class BeerOrderIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidBeerOrderDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.customerRef").exists())
-                .andExpect(jsonPath("$.paymentAmount").exists())
-                .andExpect(jsonPath("$.beerOrderLines").exists());
+                // Check that validation errors exist for all required fields
+                .andExpect(jsonPath("$['customer.name']").exists())
+                .andExpect(jsonPath("$['customer.addressLine1']").exists())
+                .andExpect(jsonPath("$['customer.city']").exists())
+                .andExpect(jsonPath("$['customer.state']").exists())
+                .andExpect(jsonPath("$['customer.zipCode']").exists())
+                .andExpect(jsonPath("$['paymentAmount']").exists())
+                .andExpect(jsonPath("$['beerOrderLines']").exists());
     }
 }

@@ -13,13 +13,10 @@ properties:
     description: Version number for optimistic locking (read-only)
     readOnly: true
     example: 0
-  customerRef:
-    type: string
-    description: Customer reference for the order (required)
-    maxLength: 255
-    minLength: 1
-    example: "Customer123"
-    x-constraint-message: "Customer reference is required"
+  customer:
+    description: Customer information for the order (required)
+    $ref: './CustomerDto.yaml'
+    x-constraint-message: "Customer is required"
   paymentAmount:
     type: number
     format: double
@@ -71,6 +68,6 @@ properties:
     readOnly: true
     example: "2023-01-15T12:00:00Z"
 required:
-  - customerRef
+  - customer
   - paymentAmount
   - beerOrderLines

@@ -3,6 +3,7 @@ package guru.springframework.juniemvc.repositories;
 import guru.springframework.juniemvc.entities.Beer;
 import guru.springframework.juniemvc.entities.BeerOrder;
 import guru.springframework.juniemvc.entities.BeerOrderLine;
+import guru.springframework.juniemvc.entities.Customer;
 import guru.springframework.juniemvc.entities.OrderLineStatus;
 import guru.springframework.juniemvc.entities.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,11 +32,29 @@ class BeerOrderLineRepositoryTest {
     @Autowired
     BeerRepository beerRepository;
 
+    @Autowired
+    CustomerRepository customerRepository;
+
     private Beer testBeer;
     private BeerOrder testBeerOrder;
+    private Customer testCustomer;
+
+    private Customer createTestCustomer(String name) {
+        return Customer.builder()
+                .name(name)
+                .addressLine1("123 Test St")
+                .city("Test City")
+                .state("TS")
+                .zipCode("12345")
+                .build();
+    }
 
     @BeforeEach
     void setUp() {
+        // Create and save a test customer
+        testCustomer = createTestCustomer("Test Customer");
+        testCustomer = customerRepository.save(testCustomer);
+
         // Create and save a test beer
         testBeer = Beer.builder()
                 .beerName("Test Beer")
@@ -48,7 +67,7 @@ class BeerOrderLineRepositoryTest {
 
         // Create and save a test beer order
         testBeerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(testCustomer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -168,8 +187,11 @@ class BeerOrderLineRepositoryTest {
         beerOrderLineRepository.save(beerOrderLine2);
 
         // Create another order with a line to ensure filtering works
+        Customer anotherCustomer = createTestCustomer("Another Customer");
+        anotherCustomer = customerRepository.save(anotherCustomer);
+
         BeerOrder anotherOrder = BeerOrder.builder()
-                .customerRef("Another Customer")
+                .customer(anotherCustomer)
                 .paymentAmount(new BigDecimal("200.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();

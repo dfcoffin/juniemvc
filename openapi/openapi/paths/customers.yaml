@@ -1,0 +1,94 @@
+get:
+  tags:
+    - Customer
+  summary: Get all customers
+  description: Returns a list of all customers in the system
+  operationId: getAllCustomers
+  security:
+    - api_key: [ ]
+  responses:
+    '200':
+      description: Successfully retrieved list of customers
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../components/schemas/CustomerDto.yaml'
+          example:
+            - id: 1
+              version: 0
+              name: "John Doe"
+              email: "john.doe@example.com"
+              phoneNumber: "555-123-4567"
+              addressLine1: "123 Main St"
+              addressLine2: "Apt 4B"
+              city: "Springfield"
+              state: "IL"
+              zipCode: "62701"
+              createDate: "2023-01-15T12:00:00Z"
+              updateDate: "2023-01-15T12:00:00Z"
+            - id: 2
+              version: 0
+              name: "Jane Smith"
+              email: "jane.smith@example.com"
+              phoneNumber: "555-987-6543"
+              addressLine1: "456 Oak Ave"
+              city: "Springfield"
+              state: "IL"
+              zipCode: "62702"
+              createDate: "2023-01-15T12:00:00Z"
+              updateDate: "2023-01-15T12:00:00Z"
+    '400':
+      description: Bad request
+    '401':
+      description: Unauthorized
+
+post:
+  tags:
+    - Customer
+  summary: Create a new customer
+  description: Creates a new customer in the system. The ID, version, createdDate, and updateDate fields will be ignored if provided.
+  operationId: createCustomer
+  security:
+    - api_key: [ ]
+  requestBody:
+    description: Customer object to be created
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/CustomerDto.yaml'
+        example:
+          name: "John Doe"
+          email: "john.doe@example.com"
+          phoneNumber: "555-123-4567"
+          addressLine1: "123 Main St"
+          addressLine2: "Apt 4B"
+          city: "Springfield"
+          state: "IL"
+          zipCode: "62701"
+  responses:
+    '201':
+      description: Successfully created a new customer
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/CustomerDto.yaml'
+          example:
+            id: 3
+            version: 0
+            name: "John Doe"
+            email: "john.doe@example.com"
+            phoneNumber: "555-123-4567"
+            addressLine1: "123 Main St"
+            addressLine2: "Apt 4B"
+            city: "Springfield"
+            state: "IL"
+            zipCode: "62701"
+            createDate: "2023-01-15T12:00:00Z"
+            updateDate: "2023-01-15T12:00:00Z"
+    '400':
+      description: "Bad request - validation error"
+    '401':
+      description: "Unauthorized"

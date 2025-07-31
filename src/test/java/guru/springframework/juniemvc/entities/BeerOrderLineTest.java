@@ -35,8 +35,16 @@ class BeerOrderLineTest {
      */
     @Test
     void testRelationshipWithBeerOrder() {
+        Customer customer = Customer.builder()
+                .name("Test Customer")
+                .addressLine1("123 Test St")
+                .city("Test City")
+                .state("TS")
+                .zipCode("12345")
+                .build();
+
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(customer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();

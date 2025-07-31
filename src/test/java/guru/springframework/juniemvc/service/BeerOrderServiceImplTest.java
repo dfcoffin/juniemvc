@@ -3,14 +3,18 @@ package guru.springframework.juniemvc.service;
 import guru.springframework.juniemvc.entities.Beer;
 import guru.springframework.juniemvc.entities.BeerOrder;
 import guru.springframework.juniemvc.entities.BeerOrderLine;
+import guru.springframework.juniemvc.entities.Customer;
 import guru.springframework.juniemvc.entities.OrderLineStatus;
 import guru.springframework.juniemvc.entities.OrderStatus;
 import guru.springframework.juniemvc.mappers.BeerOrderLineMapper;
 import guru.springframework.juniemvc.mappers.BeerOrderMapper;
+import guru.springframework.juniemvc.mappers.CustomerMapper;
 import guru.springframework.juniemvc.models.BeerOrderDto;
 import guru.springframework.juniemvc.models.BeerOrderLineDto;
+import guru.springframework.juniemvc.models.CustomerDto;
 import guru.springframework.juniemvc.repositories.BeerOrderRepository;
 import guru.springframework.juniemvc.repositories.BeerRepository;
+import guru.springframework.juniemvc.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,19 +49,57 @@ class BeerOrderServiceImplTest {
     BeerRepository beerRepository;
 
     @Mock
+    CustomerRepository customerRepository;
+
+    @Mock
     BeerOrderMapper beerOrderMapper;
 
     @Mock
     BeerOrderLineMapper beerOrderLineMapper;
 
+    @Mock
+    CustomerMapper customerMapper;
+
     @InjectMocks
     BeerOrderServiceImpl beerOrderService;
 
     private Beer testBeer;
+    private Customer testCustomer;
     private BeerOrder testBeerOrder;
     private BeerOrderLine testBeerOrderLine;
     private BeerOrderDto testBeerOrderDto;
     private BeerOrderLineDto testBeerOrderLineDto;
+    private CustomerDto testCustomerDto;
+
+    /**
+     * Helper method to create a CustomerDto with a given name
+     */
+    private CustomerDto createTestCustomerDto(String name) {
+        return CustomerDto.builder()
+                .name(name)
+                .email(name.toLowerCase().replace(' ', '.') + "@example.com")
+                .phoneNumber("555-123-4567")
+                .addressLine1("123 Test St")
+                .city("Test City")
+                .state("TS")
+                .zipCode("12345")
+                .build();
+    }
+
+    /**
+     * Helper method to create a Customer entity with a given name
+     */
+    private Customer createTestCustomer(String name) {
+        return Customer.builder()
+                .name(name)
+                .email(name.toLowerCase().replace(' ', '.') + "@example.com")
+                .phoneNumber("555-123-4567")
+                .addressLine1("123 Test St")
+                .city("Test City")
+                .state("TS")
+                .zipCode("12345")
+                .build();
+    }
 
     @BeforeEach
     void setUp() {
@@ -72,6 +114,16 @@ class BeerOrderServiceImplTest {
         testBeer.setId(1);
         testBeer.setVersion(1);
 
+        // Set up test customer
+        testCustomer = createTestCustomer("Test Customer");
+        testCustomer.setId(1);
+        testCustomer.setVersion(1);
+
+        // Set up test customer DTO
+        testCustomerDto = createTestCustomerDto("Test Customer");
+        testCustomerDto.setId(1);
+        testCustomerDto.setVersion(1);
+
         // Set up test beer order line
         testBeerOrderLine = BeerOrderLine.builder()
                 .beer(testBeer)
@@ -84,7 +136,7 @@ class BeerOrderServiceImplTest {
 
         // Set up test beer order
         testBeerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(testCustomer)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -112,7 +164,7 @@ class BeerOrderServiceImplTest {
         testBeerOrderDto = BeerOrderDto.builder()
                 .id(1)
                 .version(1)
-                .customerRef("Test Customer")
+                .customer(testCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(OrderStatus.NEW)
                 .beerOrderLines(lineSet)
@@ -176,8 +228,11 @@ class BeerOrderServiceImplTest {
         Set<BeerOrderLineDto> lineDtos = new HashSet<>();
         lineDtos.add(lineDto);
 
+        CustomerDto newCustomerDto = createTestCustomerDto("New Customer");
+        Customer newCustomer = createTestCustomer("New Customer");
+
         BeerOrderDto beerOrderDtoToSave = BeerOrderDto.builder()
-                .customerRef("New Customer")
+                .customer(newCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .beerOrderLines(lineDtos)
                 .build();
@@ -187,12 +242,12 @@ class BeerOrderServiceImplTest {
                 .build();
 
         BeerOrder beerOrderToSave = BeerOrder.builder()
-                .customerRef("New Customer")
+                .customer(newCustomer)
                 .paymentAmount(new BigDecimal("129.90"))
                 .build();
 
         BeerOrder savedBeerOrder = BeerOrder.builder()
-                .customerRef("New Customer")
+                .customer(newCustomer)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -203,12 +258,14 @@ class BeerOrderServiceImplTest {
         BeerOrderDto savedBeerOrderDto = BeerOrderDto.builder()
                 .id(2)
                 .version(1)
-                .customerRef("New Customer")
+                .customer(newCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(OrderStatus.NEW)
                 .beerOrderLines(lineDtos)
                 .build();
 
+        when(customerMapper.customerDtoToCustomer(newCustomerDto)).thenReturn(newCustomer);
+        when(customerRepository.save(newCustomer)).thenReturn(newCustomer);
         when(beerOrderMapper.beerOrderDtoToBeerOrder(beerOrderDtoToSave)).thenReturn(beerOrderToSave);
         when(beerOrderLineMapper.beerOrderLineDtoToBeerOrderLine(lineDto)).thenReturn(beerOrderLine);
         when(beerRepository.findById(1)).thenReturn(Optional.of(testBeer));
@@ -238,8 +295,11 @@ class BeerOrderServiceImplTest {
         Set<BeerOrderLineDto> lineDtos = new HashSet<>();
         lineDtos.add(lineDto);
 
+        CustomerDto newCustomerDto = createTestCustomerDto("New Customer");
+        Customer newCustomer = createTestCustomer("New Customer");
+
         BeerOrderDto beerOrderDtoToSave = BeerOrderDto.builder()
-                .customerRef("New Customer")
+                .customer(newCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(null) // Explicitly set to null to test default behavior
                 .beerOrderLines(lineDtos)
@@ -250,12 +310,12 @@ class BeerOrderServiceImplTest {
                 .build();
 
         BeerOrder beerOrderToSave = BeerOrder.builder()
-                .customerRef("New Customer")
+                .customer(newCustomer)
                 .paymentAmount(new BigDecimal("129.90"))
                 .build();
 
         BeerOrder savedBeerOrder = BeerOrder.builder()
-                .customerRef("New Customer")
+                .customer(newCustomer)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -266,12 +326,14 @@ class BeerOrderServiceImplTest {
         BeerOrderDto savedBeerOrderDto = BeerOrderDto.builder()
                 .id(2)
                 .version(1)
-                .customerRef("New Customer")
+                .customer(newCustomerDto)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(OrderStatus.NEW)
                 .beerOrderLines(lineDtos)
                 .build();
 
+        when(customerMapper.customerDtoToCustomer(newCustomerDto)).thenReturn(newCustomer);
+        when(customerRepository.save(newCustomer)).thenReturn(newCustomer);
         when(beerOrderMapper.beerOrderDtoToBeerOrder(any(BeerOrderDto.class))).thenReturn(beerOrderToSave);
         when(beerOrderLineMapper.beerOrderLineDtoToBeerOrderLine(lineDto)).thenReturn(beerOrderLine);
         when(beerRepository.findById(1)).thenReturn(Optional.of(testBeer));
@@ -297,8 +359,11 @@ class BeerOrderServiceImplTest {
         Set<BeerOrderLineDto> lineDtos = new HashSet<>();
         lineDtos.add(lineDto);
 
+        CustomerDto updatedCustomerDto = createTestCustomerDto("Updated Customer");
+        Customer updatedCustomer = createTestCustomer("Updated Customer");
+
         BeerOrderDto beerOrderDtoToUpdate = BeerOrderDto.builder()
-                .customerRef("Updated Customer")
+                .customer(updatedCustomerDto)
                 .paymentAmount(new BigDecimal("259.80"))
                 .orderStatus(OrderStatus.PROCESSING)
                 .beerOrderLines(lineDtos)
@@ -309,7 +374,7 @@ class BeerOrderServiceImplTest {
                 .build();
 
         BeerOrder existingBeerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(testCustomer)
                 .paymentAmount(new BigDecimal("129.90"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -318,7 +383,7 @@ class BeerOrderServiceImplTest {
         existingBeerOrder.addBeerOrderLine(testBeerOrderLine);
 
         BeerOrder updatedBeerOrder = BeerOrder.builder()
-                .customerRef("Updated Customer")
+                .customer(updatedCustomer)
                 .paymentAmount(new BigDecimal("259.80"))
                 .orderStatus(OrderStatus.PROCESSING)
                 .build();
@@ -329,13 +394,15 @@ class BeerOrderServiceImplTest {
         BeerOrderDto updatedBeerOrderDto = BeerOrderDto.builder()
                 .id(1)
                 .version(1)
-                .customerRef("Updated Customer")
+                .customer(updatedCustomerDto)
                 .paymentAmount(new BigDecimal("259.80"))
                 .orderStatus(OrderStatus.PROCESSING)
                 .beerOrderLines(lineDtos)
                 .build();
 
         when(beerOrderRepository.findById(1)).thenReturn(Optional.of(existingBeerOrder));
+        when(customerMapper.customerDtoToCustomer(updatedCustomerDto)).thenReturn(updatedCustomer);
+        when(customerRepository.save(updatedCustomer)).thenReturn(updatedCustomer);
         when(beerOrderLineMapper.beerOrderLineDtoToBeerOrderLine(lineDto)).thenReturn(updatedBeerOrderLine);
         when(beerRepository.findById(1)).thenReturn(Optional.of(testBeer));
         when(beerOrderRepository.save(any(BeerOrder.class))).thenReturn(updatedBeerOrder);
@@ -357,8 +424,10 @@ class BeerOrderServiceImplTest {
     @Test
     void updateBeerOrderByIdNotFound() {
         // given
+        CustomerDto updatedCustomerDto = createTestCustomerDto("Updated Customer");
+
         BeerOrderDto beerOrderDtoToUpdate = BeerOrderDto.builder()
-                .customerRef("Updated Customer")
+                .customer(updatedCustomerDto)
                 .paymentAmount(new BigDecimal("259.80"))
                 .orderStatus(OrderStatus.PROCESSING)
                 .build();

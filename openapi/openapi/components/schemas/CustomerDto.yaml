@@ -1,0 +1,78 @@
+type: object
+description: Data Transfer Object for customer information
+properties:
+  id:
+    type: integer
+    format: int32
+    description: Unique identifier for the customer
+    readOnly: true
+    example: 1
+  version:
+    type: integer
+    format: int32
+    description: Version number for optimistic locking
+    readOnly: true
+    example: 0
+  name:
+    type: string
+    description: Name of the customer
+    maxLength: 255
+    example: "John Doe"
+    x-constraint-message: "Name is required"
+  email:
+    type: string
+    description: Email address of the customer
+    format: email
+    example: "john.doe@example.com"
+    x-constraint-message: "Email must be valid"
+  phoneNumber:
+    type: string
+    description: Phone number of the customer
+    example: "555-123-4567"
+  addressLine1:
+    type: string
+    description: First line of the customer's address
+    maxLength: 255
+    example: "123 Main St"
+    x-constraint-message: "Address line 1 is required"
+  addressLine2:
+    type: string
+    description: Second line of the customer's address
+    maxLength: 255
+    example: "Apt 4B"
+  city:
+    type: string
+    description: City of the customer's address
+    maxLength: 255
+    example: "Springfield"
+    x-constraint-message: "City is required"
+  state:
+    type: string
+    description: State of the customer's address
+    maxLength: 255
+    example: "IL"
+    x-constraint-message: "State is required"
+  zipCode:
+    type: string
+    description: Zip code of the customer's address
+    maxLength: 255
+    example: "62701"
+    x-constraint-message: "Zip code is required"
+  createDate:
+    type: string
+    format: date-time
+    description: Date and time when the customer was created
+    readOnly: true
+    example: "2023-01-15T12:00:00Z"
+  updateDate:
+    type: string
+    format: date-time
+    description: Date and time when the customer was last updated
+    readOnly: true
+    example: "2023-01-15T12:00:00Z"
+required:
+  - name
+  - addressLine1
+  - city
+  - state
+  - zipCode

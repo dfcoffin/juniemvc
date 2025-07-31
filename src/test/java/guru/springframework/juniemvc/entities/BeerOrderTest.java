@@ -1,5 +1,6 @@
 package guru.springframework.juniemvc.entities;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -11,19 +12,33 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class BeerOrderTest {
 
+    private Customer testCustomer;
+
+    @BeforeEach
+    void setUp() {
+        testCustomer = Customer.builder()
+                .name("Test Customer")
+                .addressLine1("123 Test St")
+                .city("Test City")
+                .state("TS")
+                .zipCode("12345")
+                .build();
+    }
+
     /**
      * Test entity creation with all fields.
      */
     @Test
     void testBeerOrderCreation() {
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(testCustomer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
 
         assertNotNull(beerOrder);
-        assertEquals("Test Customer", beerOrder.getCustomerRef());
+        assertNotNull(beerOrder.getCustomer());
+        assertEquals("Test Customer", beerOrder.getCustomer().getName());
         assertEquals(new BigDecimal("100.00"), beerOrder.getPaymentAmount());
         assertEquals(OrderStatus.NEW, beerOrder.getOrderStatus());
         assertNotNull(beerOrder.getBeerOrderLines());
@@ -36,7 +51,7 @@ class BeerOrderTest {
     @Test
     void testBidirectionalRelationship() {
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(testCustomer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
@@ -66,7 +81,7 @@ class BeerOrderTest {
     @Test
     void testHelperMethods() {
         BeerOrder beerOrder = BeerOrder.builder()
-                .customerRef("Test Customer")
+                .customer(testCustomer)
                 .paymentAmount(new BigDecimal("100.00"))
                 .orderStatus(OrderStatus.NEW)
                 .build();
