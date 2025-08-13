@@ -17,7 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * Base entity class to handle common fields across all entities.
+ * Base entity class with common fields for all entities
  */
 @MappedSuperclass
 @Getter
@@ -36,7 +36,7 @@ public abstract class BaseEntity {
 
     @CreationTimestamp
     @Column(updatable = false)
-    private LocalDateTime createDate;
+    private LocalDateTime createdDate;
 
     @UpdateTimestamp
     private LocalDateTime updateDate;

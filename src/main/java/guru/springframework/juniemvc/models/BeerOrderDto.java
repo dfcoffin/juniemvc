@@ -1,58 +1,39 @@
 package guru.springframework.juniemvc.models;
 
-import guru.springframework.juniemvc.entities.OrderStatus;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
- * DTO for beer orders.
+ * DTO for BeerOrder entity
  */
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BeerOrderDto {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class BeerOrderDto extends BaseEntityDto {
 
-    //read only
-    private Integer id;
-    private Integer version;
-
-    @Valid
     @NotNull(message = "Customer is required")
     private CustomerDto customer;
 
-    //Payment must have no more than 10 digits and 2 decimal places
     @NotNull(message = "Payment amount is required")
     @Positive(message = "Payment amount must be positive")
-    @Digits(integer = 10, fraction = 2, message = "Payment amount must have at most 10 digits and 2 decimal places")
     private BigDecimal paymentAmount;
 
-    // ENUM Status of the order, NEW, PAID, CANCELLED, INPROCESS, COMPLETE
-    private OrderStatus orderStatus;
+    // enum status of the order, NEW, PAID, CANCELLED, INPROCESS, COMPLETE.
+    private String status;
 
-    // The order must have at least one beer line
+    @NotEmpty(message = "Beer order must have at least one beer order line")
     @Valid
-    @NotEmpty(message = "Order must contain at least one beer")
-    @Builder.Default
-    private Set<BeerOrderLineDto> beerOrderLines = new HashSet<>();
-
-    //read only created date
-    private LocalDateTime createDate;
-
-    //read only updated date
-    private LocalDateTime updateDate;
+    private Set<BeerOrderLineDto> beerOrderLines;
 }

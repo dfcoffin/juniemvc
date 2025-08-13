@@ -1,30 +1,29 @@
 package guru.springframework.juniemvc.entities;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity representing a customer.
+ * Entity representing a customer
  */
+@Entity
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@SuperBuilder
 public class Customer extends BaseEntity {
 
     @Column(nullable = false)
@@ -46,20 +45,17 @@ public class Customer extends BaseEntity {
     private String state;
     
     @Column(nullable = false)
-    private String zipCode;
+    private String postalCode;
     
-    // Bidirectional relationship with BeerOrder
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer")
     @Builder.Default
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<BeerOrder> beerOrders = new HashSet<>();
     
     /**
-     * Helper method to add a beer order to this customer.
-     * Manages the bidirectional relationship.
-     *
-     * @param beerOrder The beer order to add
+     * Helper method to add a beer order to this customer
+     * @param beerOrder the beer order to add
      */
     public void addBeerOrder(BeerOrder beerOrder) {
         if (beerOrders == null) {
@@ -70,10 +66,8 @@ public class Customer extends BaseEntity {
     }
     
     /**
-     * Helper method to remove a beer order from this customer.
-     * Manages the bidirectional relationship.
-     *
-     * @param beerOrder The beer order to remove
+     * Helper method to remove a beer order from this customer
+     * @param beerOrder the beer order to remove
      */
     public void removeBeerOrder(BeerOrder beerOrder) {
         beerOrders.remove(beerOrder);

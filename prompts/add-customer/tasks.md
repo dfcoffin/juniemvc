@@ -56,7 +56,7 @@ This document contains a detailed task list for implementing the Customer entity
 - [x] 8.3. Add any custom query methods if needed
 
 ## 9. Create Customer Service
-- [x] 9.1. Create a service interface called `CustomerService` in the package `guru.springframework.juniemvc.service`
+- [x] 9.1. Create a service interface called `CustomerService` in the package `guru.springframework.juniemvc.services`
 - [x] 9.2. Define methods for CRUD operations using CustomerDto:
   - [x] 9.2.1. getAllCustomers method
   - [x] 9.2.2. getCustomerById method
@@ -65,7 +65,7 @@ This document contains a detailed task list for implementing the Customer entity
   - [x] 9.2.5. deleteCustomerById method
 
 ## 10. Create Customer Service Implementation
-- [x] 10.1. Create a service implementation called `CustomerServiceImpl` in the package `guru.springframework.juniemvc.service`
+- [x] 10.1. Create a service implementation called `CustomerServiceImpl` in the package `guru.springframework.juniemvc.services`
 - [x] 10.2. Implement all methods defined in the CustomerService interface
 - [x] 10.3. Use the CustomerRepository and CustomerMapper for database operations and DTO conversions
 - [x] 10.4. Add appropriate transaction annotations (@Transactional)

@@ -1,4 +1,4 @@
-package guru.springframework.juniemvc.service;
+package guru.springframework.juniemvc.services;
 
 import guru.springframework.juniemvc.entities.Beer;
 import guru.springframework.juniemvc.mappers.BeerMapper;
@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the BeerService interface.
+ * Implementation of BeerService that uses BeerRepository for persistence
  */
 @Service
 public class BeerServiceImpl implements BeerService {
@@ -19,12 +19,6 @@ public class BeerServiceImpl implements BeerService {
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
 
-    /**
-     * Constructor for dependency injection.
-     * 
-     * @param beerRepository The repository for Beer entities
-     * @param beerMapper The mapper for converting between Beer entities and DTOs
-     */
     public BeerServiceImpl(BeerRepository beerRepository, BeerMapper beerMapper) {
         this.beerRepository = beerRepository;
         this.beerMapper = beerMapper;
@@ -51,25 +45,7 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public Optional<BeerDto> updateBeerById(Integer id, BeerDto beerDto) {
-        return beerRepository.findById(id)
-                .map(existingBeer -> {
-                    existingBeer.setBeerName(beerDto.getBeerName());
-                    existingBeer.setBeerStyle(beerDto.getBeerStyle());
-                    existingBeer.setUpc(beerDto.getUpc());
-                    existingBeer.setQuantityOnHand(beerDto.getQuantityOnHand());
-                    existingBeer.setPrice(beerDto.getPrice());
-                    return beerRepository.save(existingBeer);
-                })
-                .map(beerMapper::beerToBeerDto);
-    }
-
-    @Override
-    public boolean deleteBeerById(Integer id) {
-        if (beerRepository.existsById(id)) {
-            beerRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void deleteBeerById(Integer id) {
+        beerRepository.deleteById(id);
     }
 }

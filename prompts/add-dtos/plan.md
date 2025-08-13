@@ -223,7 +223,7 @@ public interface BeerMapper {
 ### 3. Updated BeerService Interface
 
 ```java
-package guru.springframework.juniemvc.service;
+package guru.springframework.juniemvc.services;
 
 import guru.springframework.juniemvc.models.BeerDto;
 
@@ -231,18 +231,22 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BeerService {
-    List<BeerDto> getAllBeers();
-    Optional<BeerDto> getBeerById(Integer id);
-    BeerDto saveBeer(BeerDto beerDto);
-    Optional<BeerDto> updateBeerById(Integer id, BeerDto beerDto);
-    boolean deleteBeerById(Integer id);
+	List<BeerDto> getAllBeers();
+
+	Optional<BeerDto> getBeerById(Integer id);
+
+	BeerDto saveBeer(BeerDto beerDto);
+
+	Optional<BeerDto> updateBeerById(Integer id, BeerDto beerDto);
+
+	boolean deleteBeerById(Integer id);
 }
 ```
 
 ### 4. Updated BeerServiceImpl Class
 
 ```java
-package guru.springframework.juniemvc.service;
+package guru.springframework.juniemvc.services;
 
 import guru.springframework.juniemvc.entities.Beer;
 import guru.springframework.juniemvc.mappers.BeerMapper;
@@ -257,58 +261,58 @@ import java.util.stream.Collectors;
 @Service
 public class BeerServiceImpl implements BeerService {
 
-    private final BeerRepository beerRepository;
-    private final BeerMapper beerMapper;
+	private final BeerRepository beerRepository;
+	private final BeerMapper beerMapper;
 
-    // Note: BeerMapper will be available as a Spring bean because of @Mapper(componentModel = "spring")
-    // MapStruct generates an implementation class at compile time
-    public BeerServiceImpl(BeerRepository beerRepository, BeerMapper beerMapper) {
-        this.beerRepository = beerRepository;
-        this.beerMapper = beerMapper;
-    }
+	// Note: BeerMapper will be available as a Spring bean because of @Mapper(componentModel = "spring")
+	// MapStruct generates an implementation class at compile time
+	public BeerServiceImpl(BeerRepository beerRepository, BeerMapper beerMapper) {
+		this.beerRepository = beerRepository;
+		this.beerMapper = beerMapper;
+	}
 
-    @Override
-    public List<BeerDto> getAllBeers() {
-        return beerRepository.findAll().stream()
-                .map(beerMapper::beerToBeerDto)
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<BeerDto> getAllBeers() {
+		return beerRepository.findAll().stream()
+				.map(beerMapper::beerToBeerDto)
+				.collect(Collectors.toList());
+	}
 
-    @Override
-    public Optional<BeerDto> getBeerById(Integer id) {
-        return beerRepository.findById(id)
-                .map(beerMapper::beerToBeerDto);
-    }
+	@Override
+	public Optional<BeerDto> getBeerById(Integer id) {
+		return beerRepository.findById(id)
+				.map(beerMapper::beerToBeerDto);
+	}
 
-    @Override
-    public BeerDto saveBeer(BeerDto beerDto) {
-        Beer beer = beerMapper.beerDtoToBeer(beerDto);
-        Beer savedBeer = beerRepository.save(beer);
-        return beerMapper.beerToBeerDto(savedBeer);
-    }
+	@Override
+	public BeerDto saveBeer(BeerDto beerDto) {
+		Beer beer = beerMapper.beerDtoToBeer(beerDto);
+		Beer savedBeer = beerRepository.save(beer);
+		return beerMapper.beerToBeerDto(savedBeer);
+	}
 
-    @Override
-    public Optional<BeerDto> updateBeerById(Integer id, BeerDto beerDto) {
-        return beerRepository.findById(id)
-                .map(existingBeer -> {
-                    existingBeer.setBeerName(beerDto.getBeerName());
-                    existingBeer.setBeerStyle(beerDto.getBeerStyle());
-                    existingBeer.setUpc(beerDto.getUpc());
-                    existingBeer.setQuantityOnHand(beerDto.getQuantityOnHand());
-                    existingBeer.setPrice(beerDto.getPrice());
-                    return beerRepository.save(existingBeer);
-                })
-                .map(beerMapper::beerToBeerDto);
-    }
+	@Override
+	public Optional<BeerDto> updateBeerById(Integer id, BeerDto beerDto) {
+		return beerRepository.findById(id)
+				.map(existingBeer -> {
+					existingBeer.setBeerName(beerDto.getBeerName());
+					existingBeer.setBeerStyle(beerDto.getBeerStyle());
+					existingBeer.setUpc(beerDto.getUpc());
+					existingBeer.setQuantityOnHand(beerDto.getQuantityOnHand());
+					existingBeer.setPrice(beerDto.getPrice());
+					return beerRepository.save(existingBeer);
+				})
+				.map(beerMapper::beerToBeerDto);
+	}
 
-    @Override
-    public boolean deleteBeerById(Integer id) {
-        if (beerRepository.existsById(id)) {
-            beerRepository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
+	@Override
+	public boolean deleteBeerById(Integer id) {
+		if (beerRepository.existsById(id)) {
+			beerRepository.deleteById(id);
+			return true;
+		}
+		return false;
+	}
 }
 ```
 
@@ -318,7 +322,7 @@ public class BeerServiceImpl implements BeerService {
 package guru.springframework.juniemvc.controllers;
 
 import guru.springframework.juniemvc.models.BeerDto;
-import guru.springframework.juniemvc.service.BeerService;
+import guru.springframework.juniemvc.services.BeerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -332,49 +336,49 @@ import java.util.Optional;
 @RequestMapping(path = "/api/v1/beer", produces = MediaType.APPLICATION_JSON_VALUE)
 public class BeerController {
 
-    private final BeerService beerService;
+	private final BeerService beerService;
 
-    public BeerController(BeerService beerService) {
-        this.beerService = beerService;
-    }
+	public BeerController(BeerService beerService) {
+		this.beerService = beerService;
+	}
 
-    @GetMapping
-    public List<BeerDto> getAllBeers() {
-        return beerService.getAllBeers();
-    }
+	@GetMapping
+	public List<BeerDto> getAllBeers() {
+		return beerService.getAllBeers();
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BeerDto> getBeerById(@PathVariable Integer id) {
-        Optional<BeerDto> beerOptional = beerService.getBeerById(id);
+	@GetMapping("/{id}")
+	public ResponseEntity<BeerDto> getBeerById(@PathVariable Integer id) {
+		Optional<BeerDto> beerOptional = beerService.getBeerById(id);
 
-        return beerOptional
-                .map(beer -> new ResponseEntity<>(beer, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+		return beerOptional
+				.map(beer -> new ResponseEntity<>(beer, HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	}
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public BeerDto createBeer(@Valid @RequestBody BeerDto beerDto) {
-        return beerService.saveBeer(beerDto);
-    }
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public BeerDto createBeer(@Valid @RequestBody BeerDto beerDto) {
+		return beerService.saveBeer(beerDto);
+	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BeerDto> updateBeer(@PathVariable Integer id, @Valid @RequestBody BeerDto beerDto) {
-        Optional<BeerDto> updatedBeerOptional = beerService.updateBeerById(id, beerDto);
+	@PutMapping("/{id}")
+	public ResponseEntity<BeerDto> updateBeer(@PathVariable Integer id, @Valid @RequestBody BeerDto beerDto) {
+		Optional<BeerDto> updatedBeerOptional = beerService.updateBeerById(id, beerDto);
 
-        return updatedBeerOptional
-                .map(updatedBeer -> new ResponseEntity<>(updatedBeer, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+		return updatedBeerOptional
+				.map(updatedBeer -> new ResponseEntity<>(updatedBeer, HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBeer(@PathVariable Integer id) {
-        boolean deleted = beerService.deleteBeerById(id);
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteBeer(@PathVariable Integer id) {
+		boolean deleted = beerService.deleteBeerById(id);
 
-        return deleted ? 
-                new ResponseEntity<>(HttpStatus.NO_CONTENT) : 
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+		return deleted ?
+				new ResponseEntity<>(HttpStatus.NO_CONTENT) :
+				new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
 }
 ```
 
@@ -430,55 +434,57 @@ package guru.springframework.juniemvc.mappers;
 
 import guru.springframework.juniemvc.entities.Beer;
 import guru.springframework.juniemvc.models.BeerDto;
+
 import javax.annotation.processing.Generated;
+
 import org.springframework.stereotype.Component;
 
 @Generated(
-    value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-11-15T10:30:00+0100",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.7 (Oracle Corporation)"
+		value = "org.mapstruct.ap.MappingProcessor",
+		date = "2023-11-15T10:30:00+0100",
+		comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.7 (Oracle Corporation)"
 )
 @Component
 public class BeerMapperImpl implements BeerMapper {
 
-    @Override
-    public BeerDto beerToBeerDto(Beer beer) {
-        if (beer == null) {
-            return null;
-        }
+	@Override
+	public BeerDto beerToBeerDto(Beer beer) {
+		if (beer == null) {
+			return null;
+		}
 
-        BeerDto.BeerDtoBuilder beerDto = BeerDto.builder();
+		BeerDto.BeerDtoBuilder beerDto = BeerDto.builder();
 
-        beerDto.id(beer.getId());
-        beerDto.version(beer.getVersion());
-        beerDto.beerName(beer.getBeerName());
-        beerDto.beerStyle(beer.getBeerStyle());
-        beerDto.upc(beer.getUpc());
-        beerDto.quantityOnHand(beer.getQuantityOnHand());
-        beerDto.price(beer.getPrice());
-        beerDto.createDate(beer.getCreateDate());
-        beerDto.updateDate(beer.getUpdateDate());
+		beerDto.id(beer.getId());
+		beerDto.version(beer.getVersion());
+		beerDto.beerName(beer.getBeerName());
+		beerDto.beerStyle(beer.getBeerStyle());
+		beerDto.upc(beer.getUpc());
+		beerDto.quantityOnHand(beer.getQuantityOnHand());
+		beerDto.price(beer.getPrice());
+		beerDto.createDate(beer.getCreatedDate());
+		beerDto.updateDate(beer.getUpdateDate());
 
-        return beerDto.build();
-    }
+		return beerDto.build();
+	}
 
-    @Override
-    public Beer beerDtoToBeer(BeerDto beerDto) {
-        if (beerDto == null) {
-            return null;
-        }
+	@Override
+	public Beer beerDtoToBeer(BeerDto beerDto) {
+		if (beerDto == null) {
+			return null;
+		}
 
-        Beer.BeerBuilder beer = Beer.builder();
+		Beer.BeerBuilder beer = Beer.builder();
 
-        beer.beerName(beerDto.getBeerName());
-        beer.beerStyle(beerDto.getBeerStyle());
-        beer.upc(beerDto.getUpc());
-        beer.quantityOnHand(beerDto.getQuantityOnHand());
-        beer.price(beerDto.getPrice());
-        // Note: id, createDate, and updateDate are ignored as specified in the mapper configuration
+		beer.beerName(beerDto.getBeerName());
+		beer.beerStyle(beerDto.getBeerStyle());
+		beer.upc(beerDto.getUpc());
+		beer.quantityOnHand(beerDto.getQuantityOnHand());
+		beer.price(beerDto.getPrice());
+		// Note: id, createDate, and updateDate are ignored as specified in the mapper configuration
 
-        return beer.build();
-    }
+		return beer.build();
+	}
 }
 ```
 

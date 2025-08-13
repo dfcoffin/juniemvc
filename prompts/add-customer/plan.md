@@ -86,7 +86,7 @@ This plan outlines the steps to add a new Customer entity to the project, along 
   ```
 
 ## 9. Create Customer Service
-- Create a service interface called `CustomerService` in the package `guru.springframework.juniemvc.service`
+- Create a service interface called `CustomerService` in the package `guru.springframework.juniemvc.services`
 - Define methods for CRUD operations using CustomerDto:
   ```java
   public interface CustomerService {
@@ -99,7 +99,7 @@ This plan outlines the steps to add a new Customer entity to the project, along 
   ```
 
 ## 10. Create Customer Service Implementation
-- Create a service implementation called `CustomerServiceImpl` in the package `guru.springframework.juniemvc.service`
+- Create a service implementation called `CustomerServiceImpl` in the package `guru.springframework.juniemvc.services`
 - Implement all methods defined in the CustomerService interface
 - Use the CustomerRepository and CustomerMapper for database operations and DTO conversions
 - Add appropriate transaction annotations (@Transactional)

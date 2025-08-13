@@ -61,7 +61,7 @@ class BeerRepositoryTest {
     void testUpdateBeer() {
         // Given
         Beer beer = Beer.builder()
-                .beerName("Original Beer")
+                .beerName("Original Name")
                 .beerStyle("IPA")
                 .upc("123456")
                 .price(new BigDecimal("12.99"))
@@ -70,11 +70,11 @@ class BeerRepositoryTest {
         Beer savedBeer = beerRepository.save(beer);
 
         // When
-        savedBeer.setBeerName("Updated Beer");
+        savedBeer.setBeerName("Updated Name");
         Beer updatedBeer = beerRepository.save(savedBeer);
 
         // Then
-        assertThat(updatedBeer.getBeerName()).isEqualTo("Updated Beer");
+        assertThat(updatedBeer.getBeerName()).isEqualTo("Updated Name");
     }
 
     @Test
@@ -91,39 +91,36 @@ class BeerRepositoryTest {
 
         // When
         beerRepository.deleteById(savedBeer.getId());
-        Optional<Beer> deletedBeerOptional = beerRepository.findById(savedBeer.getId());
+        Optional<Beer> deletedBeer = beerRepository.findById(savedBeer.getId());
 
         // Then
-        assertThat(deletedBeerOptional).isEmpty();
+        assertThat(deletedBeer).isEmpty();
     }
 
     @Test
     void testListBeers() {
         // Given
+        beerRepository.deleteAll(); // Clear any existing data
         Beer beer1 = Beer.builder()
-                .beerName("Beer One")
+                .beerName("Beer 1")
                 .beerStyle("IPA")
                 .upc("111111")
                 .price(new BigDecimal("11.99"))
                 .quantityOnHand(100)
                 .build();
-
         Beer beer2 = Beer.builder()
-                .beerName("Beer Two")
+                .beerName("Beer 2")
                 .beerStyle("Stout")
                 .upc("222222")
                 .price(new BigDecimal("13.99"))
                 .quantityOnHand(200)
                 .build();
-
-        beerRepository.save(beer1);
-        beerRepository.save(beer2);
+        beerRepository.saveAll(List.of(beer1, beer2));
 
         // When
         List<Beer> beers = beerRepository.findAll();
 
         // Then
-        assertThat(beers).isNotEmpty();
-        assertThat(beers.size()).isGreaterThanOrEqualTo(2);
+        assertThat(beers).hasSize(2);
     }
 }

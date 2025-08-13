@@ -1,10 +1,9 @@
 package guru.springframework.juniemvc.controllers;
 
 import guru.springframework.juniemvc.models.CustomerDto;
-import guru.springframework.juniemvc.service.CustomerService;
+import guru.springframework.juniemvc.services.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,26 +11,20 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST Controller for Customer operations.
+ * REST Controller for Customer operations
  */
 @RestController
-@RequestMapping(path = "/api/v1/customers", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/api/v1/customers")
 public class CustomerController {
 
     private final CustomerService customerService;
 
-    /**
-     * Constructor for dependency injection.
-     * 
-     * @param customerService The service for Customer operations
-     */
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
 
     /**
-     * Get all customers.
-     * 
+     * Get all customers
      * @return List of all customers
      */
     @GetMapping
@@ -40,60 +33,61 @@ public class CustomerController {
     }
 
     /**
-     * Get a customer by its ID.
-     * 
-     * @param id The ID of the customer to retrieve
-     * @return ResponseEntity containing the customer if found, or 404 Not Found
+     * Get a customer by its ID
+     * @param id the customer ID
+     * @return ResponseEntity with the customer if found, or 404 Not Found
      */
     @GetMapping("/{id}")
     public ResponseEntity<CustomerDto> getCustomerById(@PathVariable Integer id) {
         Optional<CustomerDto> customerOptional = customerService.getCustomerById(id);
 
         return customerOptional
-                .map(customer -> new ResponseEntity<>(customer, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
-     * Create a new customer.
-     * 
-     * @param customerDto The customer to create
-     * @return The created customer with status 201 Created
+     * Create a new customer
+     * @param customerDto the customer to create
+     * @return ResponseEntity with the created customer and 201 Created status
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerDto createCustomer(@Valid @RequestBody CustomerDto customerDto) {
+        // Ensure a new customer is created, not an update
+        customerDto.setId(null);
         return customerService.saveCustomer(customerDto);
     }
 
     /**
-     * Update an existing customer.
-     * 
-     * @param id The ID of the customer to update
-     * @param customerDto The updated customer data
-     * @return ResponseEntity containing the updated customer if found and updated, or 404 Not Found
+     * Update an existing customer
+     * @param id the customer ID
+     * @param customerDto the updated customer data
+     * @return ResponseEntity with the updated customer if found, or 404 Not Found
      */
     @PutMapping("/{id}")
     public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Integer id, @Valid @RequestBody CustomerDto customerDto) {
-        Optional<CustomerDto> updatedCustomerOptional = customerService.updateCustomerById(id, customerDto);
+        Optional<CustomerDto> updatedCustomer = customerService.updateCustomer(id, customerDto);
 
-        return updatedCustomerOptional
-                .map(updatedCustomer -> new ResponseEntity<>(updatedCustomer, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return updatedCustomer
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
-     * Delete a customer by its ID.
-     * 
-     * @param id The ID of the customer to delete
-     * @return ResponseEntity with 204 No Content if deleted, or 404 Not Found
+     * Delete a customer by its ID
+     * @param id the customer ID
+     * @return ResponseEntity with no content if successful, or 404 Not Found
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Integer id) {
-        boolean deleted = customerService.deleteCustomerById(id);
+        Optional<CustomerDto> customerOptional = customerService.getCustomerById(id);
 
-        return deleted ? 
-                new ResponseEntity<>(HttpStatus.NO_CONTENT) : 
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (customerOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        customerService.deleteCustomerById(id);
+        return ResponseEntity.noContent().build();
     }
 }

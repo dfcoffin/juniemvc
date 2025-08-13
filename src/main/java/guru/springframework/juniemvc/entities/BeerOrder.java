@@ -3,8 +3,6 @@ package guru.springframework.juniemvc.entities;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -21,17 +19,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity representing a beer order.
+ * Entity representing a beer order
  */
+@Entity
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Builder
 public class BeerOrder extends BaseEntity {
-
-//    private String customerRef;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
@@ -40,10 +36,8 @@ public class BeerOrder extends BaseEntity {
     @Column(precision = 19, scale = 2)
     private BigDecimal paymentAmount;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private String status;
 
-    // Bidirectional relationship with BeerOrderLine
     @OneToMany(mappedBy = "beerOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
@@ -51,10 +45,8 @@ public class BeerOrder extends BaseEntity {
     private Set<BeerOrderLine> beerOrderLines = new HashSet<>();
 
     /**
-     * Helper method to add a beer order line to this order.
-     * Manages the bidirectional relationship.
-     *
-     * @param line The beer order line to add
+     * Helper method to add a beer order line to this order
+     * @param line the beer order line to add
      */
     public void addBeerOrderLine(BeerOrderLine line) {
         if (beerOrderLines == null) {
@@ -65,10 +57,8 @@ public class BeerOrder extends BaseEntity {
     }
 
     /**
-     * Helper method to remove a beer order line from this order.
-     * Manages the bidirectional relationship.
-     *
-     * @param line The beer order line to remove
+     * Helper method to remove a beer order line from this order
+     * @param line the beer order line to remove
      */
     public void removeBeerOrderLine(BeerOrderLine line) {
         beerOrderLines.remove(line);

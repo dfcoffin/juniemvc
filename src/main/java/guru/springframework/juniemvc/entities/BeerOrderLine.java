@@ -1,8 +1,6 @@
 package guru.springframework.juniemvc.entities;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -10,17 +8,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 /**
- * Entity representing a line item in a beer order.
+ * Entity representing a line item in a beer order
  */
+@Entity
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Builder
 public class BeerOrderLine extends BaseEntity {
 
     @ManyToOne
@@ -32,9 +29,6 @@ public class BeerOrderLine extends BaseEntity {
     private Beer beer;
 
     private Integer orderQuantity;
-
     private Integer quantityAllocated;
-
-    @Enumerated(EnumType.STRING)
-    private OrderLineStatus lineStatus;
+    private String status;
 }

@@ -1,6 +1,7 @@
-package guru.springframework.juniemvc.service;
+package guru.springframework.juniemvc.services;
 
 import guru.springframework.juniemvc.entities.Customer;
+import guru.springframework.juniemvc.exceptions.NotFoundException;
 import guru.springframework.juniemvc.mappers.CustomerMapper;
 import guru.springframework.juniemvc.models.CustomerDto;
 import guru.springframework.juniemvc.repositories.CustomerRepository;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the CustomerService interface.
+ * Implementation of CustomerService
  */
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -20,12 +21,6 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
-    /**
-     * Constructor for dependency injection.
-     * 
-     * @param customerRepository The repository for Customer entities
-     * @param customerMapper The mapper for converting between Customer entities and DTOs
-     */
     public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerMapper) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
@@ -56,29 +51,21 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public Optional<CustomerDto> updateCustomerById(Integer id, CustomerDto customerDto) {
-        return customerRepository.findById(id)
-                .map(existingCustomer -> {
-                    existingCustomer.setName(customerDto.getName());
-                    existingCustomer.setEmail(customerDto.getEmail());
-                    existingCustomer.setPhoneNumber(customerDto.getPhoneNumber());
-                    existingCustomer.setAddressLine1(customerDto.getAddressLine1());
-                    existingCustomer.setAddressLine2(customerDto.getAddressLine2());
-                    existingCustomer.setCity(customerDto.getCity());
-                    existingCustomer.setState(customerDto.getState());
-                    existingCustomer.setZipCode(customerDto.getZipCode());
-                    return customerRepository.save(existingCustomer);
-                })
-                .map(customerMapper::customerToCustomerDto);
+    public Optional<CustomerDto> updateCustomer(Integer id, CustomerDto customerDto) {
+        Customer existingCustomer = customerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Customer not found with id: " + id));
+
+        // Update properties from DTO to existing entity using mapper
+        customerMapper.updateCustomerFromDto(customerDto, existingCustomer);
+
+        // Save the updated entity
+        Customer savedCustomer = customerRepository.save(existingCustomer);
+        return Optional.of(customerMapper.customerToCustomerDto(savedCustomer));
     }
 
     @Override
     @Transactional
-    public boolean deleteCustomerById(Integer id) {
-        if (customerRepository.existsById(id)) {
-            customerRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void deleteCustomerById(Integer id) {
+        customerRepository.deleteById(id);
     }
 }

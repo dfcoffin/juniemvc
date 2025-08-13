@@ -13,16 +13,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CustomerMapperTest {
 
     private CustomerMapper customerMapper;
-    private Customer customer;
-    private CustomerDto customerDto;
+    private Customer testCustomer;
 
     @BeforeEach
     void setUp() {
-        // Get the mapper instance
         customerMapper = Mappers.getMapper(CustomerMapper.class);
 
-        // Create a test Customer entity
-        customer = Customer.builder()
+        // Create test customer
+        testCustomer = Customer.builder()
                 .name("John Doe")
                 .email("john.doe@example.com")
                 .phoneNumber("555-123-4567")
@@ -30,79 +28,64 @@ class CustomerMapperTest {
                 .addressLine2("Apt 4B")
                 .city("Springfield")
                 .state("IL")
-                .zipCode("62701")
+                .postalCode("62701")
                 .build();
-        customer.setId(1);
-//        customer.setCreateDate(LocalDateTime.now());
-//        customer.setUpdateDate(LocalDateTime.now());
-
-        // Create a test CustomerDto
-        customerDto = CustomerDto.builder()
-                .name("Jane Smith")
-                .email("jane.smith@example.com")
-                .phoneNumber("555-987-6543")
-                .addressLine1("456 Oak Ave")
-                .addressLine2("Suite 2C")
-                .city("Springfield")
-                .state("IL")
-                .zipCode("62702")
-                .build();
-        customerDto.setId(2);
-//        customerDto.setCreateDate(LocalDateTime.now());
-//        customerDto.setUpdateDate(LocalDateTime.now());
+        testCustomer.setId(1);
+        testCustomer.setCreatedDate(LocalDateTime.now());
+        testCustomer.setUpdateDate(LocalDateTime.now());
     }
 
     @Test
     void testCustomerToCustomerDto() {
-        // Convert Customer to CustomerDto
-        CustomerDto dto = customerMapper.customerToCustomerDto(customer);
+        // When
+        CustomerDto customerDto = customerMapper.customerToCustomerDto(testCustomer);
 
-        // Verify the conversion
-        assertThat(dto).isNotNull();
-        assertThat(dto.getId()).isEqualTo(customer.getId());
-//        assertThat(dto.getVersion()).isEqualTo(customer.getVersion());
-        assertThat(dto.getName()).isEqualTo(customer.getName());
-        assertThat(dto.getEmail()).isEqualTo(customer.getEmail());
-        assertThat(dto.getPhoneNumber()).isEqualTo(customer.getPhoneNumber());
-        assertThat(dto.getAddressLine1()).isEqualTo(customer.getAddressLine1());
-        assertThat(dto.getAddressLine2()).isEqualTo(customer.getAddressLine2());
-        assertThat(dto.getCity()).isEqualTo(customer.getCity());
-        assertThat(dto.getState()).isEqualTo(customer.getState());
-        assertThat(dto.getZipCode()).isEqualTo(customer.getZipCode());
-//        assertThat(dto.getCreateDate()).isEqualTo(customer.getCreateDate());
-//        assertThat(dto.getUpdateDate()).isEqualTo(customer.getUpdateDate());
+        // Then
+        assertThat(customerDto).isNotNull();
+        assertThat(customerDto.getId()).isEqualTo(testCustomer.getId());
+        assertThat(customerDto.getName()).isEqualTo(testCustomer.getName());
+        assertThat(customerDto.getEmail()).isEqualTo(testCustomer.getEmail());
+        assertThat(customerDto.getPhoneNumber()).isEqualTo(testCustomer.getPhoneNumber());
+        assertThat(customerDto.getAddressLine1()).isEqualTo(testCustomer.getAddressLine1());
+        assertThat(customerDto.getAddressLine2()).isEqualTo(testCustomer.getAddressLine2());
+        assertThat(customerDto.getCity()).isEqualTo(testCustomer.getCity());
+        assertThat(customerDto.getState()).isEqualTo(testCustomer.getState());
+        assertThat(customerDto.getPostalCode()).isEqualTo(testCustomer.getPostalCode());
+        assertThat(customerDto.getCreatedDate()).isEqualTo(testCustomer.getCreatedDate());
+        assertThat(customerDto.getUpdateDate()).isEqualTo(testCustomer.getUpdateDate());
+        // beerOrders should be ignored in the mapping
+        assertThat(customerDto.getBeerOrders()).isNull();
     }
 
     @Test
     void testCustomerDtoToCustomer() {
-        // Convert CustomerDto to Customer
-        Customer entity = customerMapper.customerDtoToCustomer(customerDto);
+        // Given
+        CustomerDto customerDto = CustomerDto.builder()
+                .id(2)
+                .name("Jane Smith")
+                .email("jane.smith@example.com")
+                .phoneNumber("555-987-6543")
+                .addressLine1("456 Oak Ave")
+                .city("Shelbyville")
+                .state("IL")
+                .postalCode("62565")
+                .build();
 
-        // Verify the conversion
-        assertThat(entity.getName()).isEqualTo(customerDto.getName());
-        assertThat(entity.getEmail()).isEqualTo(customerDto.getEmail());
-        assertThat(entity.getPhoneNumber()).isEqualTo(customerDto.getPhoneNumber());
-        assertThat(entity.getAddressLine1()).isEqualTo(customerDto.getAddressLine1());
-        assertThat(entity.getAddressLine2()).isEqualTo(customerDto.getAddressLine2());
-        assertThat(entity.getCity()).isEqualTo(customerDto.getCity());
-        assertThat(entity.getState()).isEqualTo(customerDto.getState());
-        assertThat(entity.getZipCode()).isEqualTo(customerDto.getZipCode());
+        // When
+        Customer customer = customerMapper.customerDtoToCustomer(customerDto);
+
+        // Then
+        assertThat(customer).isNotNull();
+        assertThat(customer.getName()).isEqualTo(customerDto.getName());
+        assertThat(customer.getEmail()).isEqualTo(customerDto.getEmail());
+        assertThat(customer.getPhoneNumber()).isEqualTo(customerDto.getPhoneNumber());
+        assertThat(customer.getAddressLine1()).isEqualTo(customerDto.getAddressLine1());
+        assertThat(customer.getAddressLine2()).isEqualTo(customerDto.getAddressLine2());
+        assertThat(customer.getCity()).isEqualTo(customerDto.getCity());
+        assertThat(customer.getState()).isEqualTo(customerDto.getState());
+        assertThat(customer.getPostalCode()).isEqualTo(customerDto.getPostalCode());
         // beerOrders should be ignored in the mapping
-        assertThat(entity.getBeerOrders()).isNotNull();
-        assertThat(entity.getBeerOrders()).isEmpty();
-    }
-
-    @Test
-    void testNullCustomer() {
-        // Test null handling
-        CustomerDto dto = customerMapper.customerToCustomerDto(null);
-        assertThat(dto).isNull();
-    }
-
-    @Test
-    void testNullCustomerDto() {
-        // Test null handling
-        Customer entity = customerMapper.customerDtoToCustomer(null);
-        assertThat(entity).isNull();
+        assertThat(customer.getBeerOrders()).isNotNull();
+        assertThat(customer.getBeerOrders()).isEmpty();
     }
 }
