@@ -36,4 +36,7 @@ public class BeerOrderDto extends BaseEntityDto {
     @NotEmpty(message = "Beer order must have at least one beer order line")
     @Valid
     private Set<BeerOrderLineDto> beerOrderLines;
+
+    @Valid
+    private Set<BeerOrderShipmentDto> shipments;
 }

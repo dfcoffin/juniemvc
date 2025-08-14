@@ -44,6 +44,12 @@ public class BeerOrder extends BaseEntity {
     @EqualsAndHashCode.Exclude
     private Set<BeerOrderLine> beerOrderLines = new HashSet<>();
 
+    @OneToMany(mappedBy = "beerOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<BeerOrderShipment> shipments = new HashSet<>();
+
     /**
      * Helper method to add a beer order line to this order
      * @param line the beer order line to add
@@ -63,5 +69,26 @@ public class BeerOrder extends BaseEntity {
     public void removeBeerOrderLine(BeerOrderLine line) {
         beerOrderLines.remove(line);
         line.setBeerOrder(null);
+    }
+
+    /**
+     * Helper method to add a shipment to this order
+     * @param shipment the shipment to add
+     */
+    public void addShipment(BeerOrderShipment shipment) {
+        if (shipments == null) {
+            shipments = new HashSet<>();
+        }
+        shipments.add(shipment);
+        shipment.setBeerOrder(this);
+    }
+
+    /**
+     * Helper method to remove a shipment from this order
+     * @param shipment the shipment to remove
+     */
+    public void removeShipment(BeerOrderShipment shipment) {
+        shipments.remove(shipment);
+        shipment.setBeerOrder(null);
     }
 }

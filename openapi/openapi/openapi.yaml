@@ -45,7 +45,7 @@ externalDocs:
   url: 'https://github.com/Redocly/create-openapi-repo'
 tags:
   - name: Beer
-    description: "Operations for managing beers."
+    description: "Operations for managing beer inventory."
   - name: BeerOrder
     description: "Operations for managing beer orders."
   - name: Customer
@@ -64,14 +64,18 @@ servers:
         description: Your tenant id
   - url: https://example.com/api/v1
 paths:
-  '/api/v1/beer':
+  '/api/v1/beers':
     $ref: 'paths/beers.yaml'
-  '/api/v1/beer/{id}':
+  '/api/v1/beers/{id}':
     $ref: 'paths/beers_{id}.yaml'
-  '/api/v1/beerorder':
+  '/api/v1/beer-orders':
     $ref: 'paths/beer-orders.yaml'
-  '/api/v1/beerorder/{id}':
+  '/api/v1/beer-orders/{id}':
     $ref: 'paths/beer-orders_{id}.yaml'
+  '/api/v1/beer-orders/{beerOrderId}/shipments':
+    $ref: 'paths/beer-orders_{beerOrderId}_shipments.yaml'
+  '/api/v1/beer-orders/{beerOrderId}/shipments/{shipmentId}':
+    $ref: 'paths/beer-orders_{beerOrderId}_shipments_{shipmentId}.yaml'
   '/api/v1/customers':
     $ref: 'paths/customers.yaml'
   '/api/v1/customers/{id}':

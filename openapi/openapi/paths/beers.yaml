@@ -2,13 +2,13 @@ get:
   tags:
     - Beer
   summary: Get all beers
-  description: Returns a list of all beers in the system
+  description: "Returns a list of all beers in the system."
   operationId: getAllBeers
   security:
     - api_key: [ ]
   responses:
     '200':
-      description: Successfully retrieved list of beers
+      description: "Successfully retrieved the list of beers"
       content:
         application/json:
           schema:
@@ -18,51 +18,50 @@ get:
           example:
             - id: 1
               version: 0
+              createdDate: "2023-01-01T12:00:00Z"
+              updateDate: "2023-01-01T12:00:00Z"
               beerName: "Mango Bobs"
               beerStyle: "IPA"
               upc: "0631234200036"
-              quantityOnHand: 122
+              quantityOnHand: 100
               price: 12.99
-              createDate: "2023-01-15T12:00:00Z"
-              updateDate: "2023-01-15T12:00:00Z"
             - id: 2
               version: 0
+              createdDate: "2023-01-02T10:00:00Z"
+              updateDate: "2023-01-02T10:00:00Z"
               beerName: "Galaxy Cat"
               beerStyle: "PALE_ALE"
               upc: "0631234300019"
-              quantityOnHand: 392
+              quantityOnHand: 75
               price: 11.99
-              createDate: "2023-01-15T12:00:00Z"
-              updateDate: "2023-01-15T12:00:00Z"
     '400':
-      description: Bad request
+      description: "Bad request"
     '401':
-      description: Unauthorized
-
+      description: "Unauthorized"
 post:
   tags:
     - Beer
   summary: Create a new beer
-  description: Creates a new beer in the system. The ID, version, createdDate, and updateDate fields will be ignored if provided.
+  description: "Creates a new beer in the system. The ID, version, createdDate, and updateDate fields will be ignored if provided."
   operationId: createBeer
   security:
     - api_key: [ ]
   requestBody:
-    description: Beer object to be created
+    description: "Beer object to be created"
     required: true
     content:
       application/json:
         schema:
           $ref: '../components/schemas/BeerDto.yaml'
         example:
-          beerName: "Mango Bobs"
-          beerStyle: "IPA"
-          upc: "0631234200036"
-          quantityOnHand: 122
-          price: 12.99
+          beerName: "New Beer"
+          beerStyle: "LAGER"
+          upc: "0631234500033"
+          quantityOnHand: 50
+          price: 9.99
   responses:
     '201':
-      description: Successfully created a new beer
+      description: "Successfully created a new beer"
       content:
         application/json:
           schema:
@@ -70,13 +69,13 @@ post:
           example:
             id: 3
             version: 0
-            beerName: "Mango Bobs"
-            beerStyle: "IPA"
-            upc: "0631234200036"
-            quantityOnHand: 122
-            price: 12.99
-            createDate: "2023-01-15T12:00:00Z"
-            updateDate: "2023-01-15T12:00:00Z"
+            createdDate: "2023-01-03T15:00:00Z"
+            updateDate: "2023-01-03T15:00:00Z"
+            beerName: "New Beer"
+            beerStyle: "LAGER"
+            upc: "0631234500033"
+            quantityOnHand: 50
+            price: 9.99
     '400':
       description: "Bad request - validation error"
     '401':

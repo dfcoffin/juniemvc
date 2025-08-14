@@ -21,7 +21,7 @@ public class CustomerDto extends BaseEntityDto {
 
     @NotBlank(message = "Name is required")
     private String name;
-
+    
     private String email;
     
     private String phoneNumber;
