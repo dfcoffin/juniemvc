@@ -5,7 +5,7 @@ get:
   description: "Returns a list of all beer orders in the system."
   operationId: getAllBeerOrders
   security:
-    - api_key: [ ]
+    - api_key: []
   responses:
     '200':
       description: "Successfully retrieved the list of beer orders"
@@ -63,7 +63,7 @@ post:
   description: "Creates a new beer order in the system. The ID, version, createdDate, and updateDate fields will be ignored if provided."
   operationId: createBeerOrder
   security:
-    - api_key: [ ]
+    - api_key: []
   requestBody:
     description: "Beer order object to be created"
     required: true

@@ -13,7 +13,7 @@ get:
   description: "Returns a single beer identified by its ID."
   operationId: getBeerById
   security:
-    - api_key: [ ]
+    - api_key: []
   responses:
     '200':
       description: "Successfully retrieved the beer"
@@ -44,7 +44,7 @@ put:
   description: "Updates an existing beer identified by its ID. The ID in the path must match the ID in the request body."
   operationId: updateBeer
   security:
-    - api_key: [ ]
+    - api_key: []
   requestBody:
     description: "Updated beer object"
     required: true

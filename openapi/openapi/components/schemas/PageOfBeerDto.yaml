@@ -1,0 +1,9 @@
+allOf:
+  - $ref: './Page.yaml'
+  - type: object
+    properties:
+      content:
+        type: array
+        description: The page content
+        items:
+          $ref: './BeerDto.yaml'

@@ -1,0 +1,72 @@
+type: object
+description: A page of results
+properties:
+  content:
+    type: array
+    description: The page content
+    items:
+      type: object
+  pageable:
+    type: object
+    description: The pagination information
+    properties:
+      sort:
+        type: object
+        properties:
+          sorted:
+            type: boolean
+          unsorted:
+            type: boolean
+          empty:
+            type: boolean
+      offset:
+        type: integer
+        format: int64
+      pageNumber:
+        type: integer
+        format: int32
+      pageSize:
+        type: integer
+        format: int32
+      paged:
+        type: boolean
+      unpaged:
+        type: boolean
+  totalPages:
+    type: integer
+    format: int32
+    description: The total number of pages
+  totalElements:
+    type: integer
+    format: int64
+    description: The total number of elements
+  last:
+    type: boolean
+    description: Whether this is the last page
+  size:
+    type: integer
+    format: int32
+    description: The size of the page
+  number:
+    type: integer
+    format: int32
+    description: The page number (0-based)
+  sort:
+    type: object
+    properties:
+      sorted:
+        type: boolean
+      unsorted:
+        type: boolean
+      empty:
+        type: boolean
+  numberOfElements:
+    type: integer
+    format: int32
+    description: The number of elements in this page
+  first:
+    type: boolean
+    description: Whether this is the first page
+  empty:
+    type: boolean
+    description: Whether the page is empty

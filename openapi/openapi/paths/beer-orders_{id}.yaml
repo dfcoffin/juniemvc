@@ -13,7 +13,7 @@ get:
   description: "Returns a beer order by its ID."
   operationId: getBeerOrderById
   security:
-    - api_key: [ ]
+    - api_key: []
   responses:
     '200':
       description: "Successfully retrieved the beer order"
@@ -52,7 +52,7 @@ put:
   description: "Updates an existing beer order. The ID in the path must match the ID in the request body."
   operationId: updateBeerOrder
   security:
-    - api_key: [ ]
+    - api_key: []
   requestBody:
     description: "Beer order object with updated information"
     required: true

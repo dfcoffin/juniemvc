@@ -10,15 +10,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +73,49 @@ class BeerServiceImplTest {
         assertThat(beers).hasSize(1);
         assertThat(beers.get(0).getBeerName()).isEqualTo("Test Beer");
         verify(beerRepository, times(1)).findAll();
+        verify(beerMapper, times(1)).beerToBeerDto(any(Beer.class));
+    }
+
+    @Test
+    void getAllBeersWithPagination() {
+        // Given
+        Pageable pageable = PageRequest.of(0, 20);
+        List<Beer> beers = Arrays.asList(testBeer);
+        Page<Beer> beerPage = new PageImpl<>(beers, pageable, 1);
+
+        when(beerRepository.findAllByBeerNameContainingIgnoreCase("", pageable)).thenReturn(beerPage);
+        when(beerMapper.beerToBeerDto(testBeer)).thenReturn(testBeerDto);
+
+        // When
+        Page<BeerDto> result = beerService.getAllBeers(null, pageable);
+
+        // Then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getBeerName()).isEqualTo("Test Beer");
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(beerRepository, times(1)).findAllByBeerNameContainingIgnoreCase("", pageable);
+        verify(beerMapper, times(1)).beerToBeerDto(any(Beer.class));
+    }
+
+    @Test
+    void getAllBeersWithBeerNameFilter() {
+        // Given
+        String beerName = "Test";
+        Pageable pageable = PageRequest.of(0, 20);
+        List<Beer> beers = Arrays.asList(testBeer);
+        Page<Beer> beerPage = new PageImpl<>(beers, pageable, 1);
+
+        when(beerRepository.findAllByBeerNameContainingIgnoreCase(beerName, pageable)).thenReturn(beerPage);
+        when(beerMapper.beerToBeerDto(testBeer)).thenReturn(testBeerDto);
+
+        // When
+        Page<BeerDto> result = beerService.getAllBeers(beerName, pageable);
+
+        // Then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getBeerName()).isEqualTo("Test Beer");
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(beerRepository, times(1)).findAllByBeerNameContainingIgnoreCase(beerName, pageable);
         verify(beerMapper, times(1)).beerToBeerDto(any(Beer.class));
     }
 

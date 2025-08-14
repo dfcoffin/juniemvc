@@ -13,7 +13,7 @@ get:
   description: "Returns a single customer by ID."
   operationId: getCustomerById
   security:
-    - api_key: [ ]
+    - api_key: []
   responses:
     '200':
       description: "Successfully retrieved the customer"
@@ -45,7 +45,7 @@ put:
   description: "Updates an existing customer in the system. The ID in the path must match the ID in the request body."
   operationId: updateCustomer
   security:
-    - api_key: [ ]
+    - api_key: []
   requestBody:
     description: "Customer object with updated fields"
     required: true
