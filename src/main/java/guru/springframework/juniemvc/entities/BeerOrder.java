@@ -38,6 +38,8 @@ public class BeerOrder extends BaseEntity {
 
     private String status;
 
+    private String description;
+
     @OneToMany(mappedBy = "beerOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude

@@ -29,6 +29,7 @@ public class Beer extends BaseEntity {
     private String beerStyle;
     private String upc;
     private Integer quantityOnHand;
+    private String description;
 
     @Column(precision = 19, scale = 2)
     private BigDecimal price;

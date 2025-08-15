@@ -7,12 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -24,7 +24,6 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,7 +36,7 @@ class BeerControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     BeerService beerService;
 
     BeerDto testBeer;
@@ -47,6 +46,7 @@ class BeerControllerTest {
         testBeer = BeerDto.builder()
                 .id(1)
                 .beerName("Test Beer")
+                .description("A test IPA beer")
                 .beerStyle("IPA")
                 .upc("123456")
                 .price(new BigDecimal("12.99"))
@@ -60,7 +60,7 @@ class BeerControllerTest {
         List<BeerDto> beers = Arrays.asList(testBeer);
         Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
 
-        given(beerService.getAllBeers(eq(null), any(Pageable.class))).willReturn(beerPage);
+        given(beerService.getAllBeers(eq(null), eq(null), any(Pageable.class))).willReturn(beerPage);
 
         // When/Then
         mockMvc.perform(get("/api/v1/beers")
@@ -78,7 +78,7 @@ class BeerControllerTest {
         List<BeerDto> beers = Arrays.asList(testBeer);
         Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
 
-        given(beerService.getAllBeers(eq(null), any(Pageable.class))).willReturn(beerPage);
+        given(beerService.getAllBeers(eq(null), eq(null), any(Pageable.class))).willReturn(beerPage);
 
         // When/Then
         mockMvc.perform(get("/api/v1/beers")
@@ -102,7 +102,7 @@ class BeerControllerTest {
         List<BeerDto> beers = Arrays.asList(testBeer);
         Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
 
-        given(beerService.getAllBeers(eq("Test"), any(Pageable.class))).willReturn(beerPage);
+        given(beerService.getAllBeers(eq("Test"), eq(null), any(Pageable.class))).willReturn(beerPage);
 
         // When/Then
         mockMvc.perform(get("/api/v1/beers")
@@ -115,6 +115,59 @@ class BeerControllerTest {
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].id", is(1)))
                 .andExpect(jsonPath("$.content[0].beerName", is("Test Beer")))
+                .andExpect(jsonPath("$.totalElements", is(1)))
+                .andExpect(jsonPath("$.totalPages", is(1)))
+                .andExpect(jsonPath("$.size", is(20)))
+                .andExpect(jsonPath("$.number", is(0)));
+    }
+
+    @Test
+    void testGetAllBeersWithBeerStyleFilter() throws Exception {
+        // Given
+        List<BeerDto> beers = Arrays.asList(testBeer);
+        Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
+
+        given(beerService.getAllBeers(eq(null), eq("IPA"), any(Pageable.class))).willReturn(beerPage);
+
+        // When/Then
+        mockMvc.perform(get("/api/v1/beers")
+                .param("beerStyle", "IPA")
+                .param("page", "0")
+                .param("size", "20")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id", is(1)))
+                .andExpect(jsonPath("$.content[0].beerName", is("Test Beer")))
+                .andExpect(jsonPath("$.content[0].beerStyle", is("IPA")))
+                .andExpect(jsonPath("$.totalElements", is(1)))
+                .andExpect(jsonPath("$.totalPages", is(1)))
+                .andExpect(jsonPath("$.size", is(20)))
+                .andExpect(jsonPath("$.number", is(0)));
+    }
+
+    @Test
+    void testGetAllBeersWithBeerNameAndBeerStyleFilter() throws Exception {
+        // Given
+        List<BeerDto> beers = Arrays.asList(testBeer);
+        Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
+
+        given(beerService.getAllBeers(eq("Test"), eq("IPA"), any(Pageable.class))).willReturn(beerPage);
+
+        // When/Then
+        mockMvc.perform(get("/api/v1/beers")
+                .param("beerName", "Test")
+                .param("beerStyle", "IPA")
+                .param("page", "0")
+                .param("size", "20")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id", is(1)))
+                .andExpect(jsonPath("$.content[0].beerName", is("Test Beer")))
+                .andExpect(jsonPath("$.content[0].beerStyle", is("IPA")))
                 .andExpect(jsonPath("$.totalElements", is(1)))
                 .andExpect(jsonPath("$.totalPages", is(1)))
                 .andExpect(jsonPath("$.size", is(20)))
@@ -151,6 +204,7 @@ class BeerControllerTest {
         // Given
         BeerDto beerToCreate = BeerDto.builder()
                 .beerName("New Beer")
+                .description("A robust stout beer")
                 .beerStyle("Stout")
                 .upc("654321")
                 .price(new BigDecimal("14.99"))
@@ -160,6 +214,7 @@ class BeerControllerTest {
         BeerDto savedBeer = BeerDto.builder()
                 .id(2)
                 .beerName("New Beer")
+                .description("A robust stout beer")
                 .beerStyle("Stout")
                 .upc("654321")
                 .price(new BigDecimal("14.99"))
@@ -182,6 +237,7 @@ class BeerControllerTest {
         // Given
         BeerDto beerToUpdate = BeerDto.builder()
                 .beerName("Updated Beer")
+                .description("An updated description for the beer")
                 .beerStyle("Lager")
                 .upc("789012")
                 .price(new BigDecimal("16.99"))
@@ -191,6 +247,7 @@ class BeerControllerTest {
         BeerDto updatedBeer = BeerDto.builder()
                 .id(1)
                 .beerName("Updated Beer")
+                .description("An updated description for the beer")
                 .beerStyle("Lager")
                 .upc("789012")
                 .price(new BigDecimal("16.99"))
@@ -259,6 +316,7 @@ class BeerControllerTest {
         BeerDto invalidBeer = BeerDto.builder()
                 // Missing required fields
                 .beerName("")
+                .description("This is a valid description but other fields are invalid")
                 .beerStyle("")
                 .upc("")
                 .price(new BigDecimal("-1.0"))

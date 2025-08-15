@@ -34,6 +34,8 @@ public class BeerDto extends BaseEntityDto {
     @PositiveOrZero(message = "Quantity on hand must be zero or positive")
     private Integer quantityOnHand;
 
+    private String description;
+
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be positive")
     private BigDecimal price;

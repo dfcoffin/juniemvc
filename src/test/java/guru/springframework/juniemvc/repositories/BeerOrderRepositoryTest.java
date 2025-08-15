@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 class BeerOrderRepositoryTest {
@@ -62,6 +62,7 @@ class BeerOrderRepositoryTest {
                 .customer(testCustomer)
                 .paymentAmount(new BigDecimal("25.98"))
                 .status("NEW")
+                .description("Test order description")
                 .build();
 
         BeerOrderLine beerOrderLine = BeerOrderLine.builder()
@@ -90,6 +91,7 @@ class BeerOrderRepositoryTest {
                 .customer(testCustomer)
                 .paymentAmount(new BigDecimal("25.98"))
                 .status("NEW")
+                .description("Order for testing retrieval")
                 .build();
 
         BeerOrderLine beerOrderLine = BeerOrderLine.builder()
@@ -111,6 +113,7 @@ class BeerOrderRepositoryTest {
         assertThat(fetchedBeerOrder.getCustomer()).isNotNull();
         assertThat(fetchedBeerOrder.getCustomer().getName()).isEqualTo(testCustomer.getName());
         assertThat(fetchedBeerOrder.getBeerOrderLines()).hasSize(1);
+        assertThat(fetchedBeerOrder.getDescription()).isEqualTo("Order for testing retrieval");
     }
 
     @Test
@@ -120,6 +123,7 @@ class BeerOrderRepositoryTest {
                 .customer(testCustomer)
                 .paymentAmount(new BigDecimal("25.98"))
                 .status("NEW")
+                .description("Initial description")
                 .build();
 
         BeerOrderLine beerOrderLine = BeerOrderLine.builder()
@@ -147,12 +151,14 @@ class BeerOrderRepositoryTest {
 
         savedBeerOrder.setCustomer(updatedCustomer);
         savedBeerOrder.setStatus("PROCESSING");
+        savedBeerOrder.setDescription("Updated description");
         BeerOrder updatedBeerOrder = beerOrderRepository.save(savedBeerOrder);
 
         // Then
         assertThat(updatedBeerOrder.getCustomer()).isNotNull();
         assertThat(updatedBeerOrder.getCustomer().getName()).isEqualTo("Updated Customer");
         assertThat(updatedBeerOrder.getStatus()).isEqualTo("PROCESSING");
+        assertThat(updatedBeerOrder.getDescription()).isEqualTo("Updated description");
     }
 
     @Test
@@ -162,6 +168,7 @@ class BeerOrderRepositoryTest {
                 .customer(testCustomer)
                 .paymentAmount(new BigDecimal("25.98"))
                 .status("NEW")
+                .description("Order to be deleted")
                 .build();
 
         BeerOrderLine beerOrderLine = BeerOrderLine.builder()
@@ -215,6 +222,7 @@ class BeerOrderRepositoryTest {
                 .customer(customer1)
                 .paymentAmount(new BigDecimal("25.98"))
                 .status("NEW")
+                .description("First test order")
                 .build();
 
         BeerOrderLine beerOrderLine1 = BeerOrderLine.builder()
@@ -230,6 +238,7 @@ class BeerOrderRepositoryTest {
                 .customer(customer2)
                 .paymentAmount(new BigDecimal("39.97"))
                 .status("PROCESSING")
+                .description("Second test order")
                 .build();
 
         BeerOrderLine beerOrderLine2 = BeerOrderLine.builder()

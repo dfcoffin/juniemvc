@@ -33,6 +33,8 @@ public class BeerOrderDto extends BaseEntityDto {
     // enum status of the order, NEW, PAID, CANCELLED, INPROCESS, COMPLETE.
     private String status;
 
+    private String description;
+
     @NotEmpty(message = "Beer order must have at least one beer order line")
     @Valid
     private Set<BeerOrderLineDto> beerOrderLines;

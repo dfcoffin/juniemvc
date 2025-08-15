@@ -25,12 +25,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BeerOrderServiceImplTest {
@@ -108,6 +105,7 @@ class BeerOrderServiceImplTest {
                 .customer(testCustomer)
                 .paymentAmount(new BigDecimal("25.98"))
                 .status("NEW")
+                .description("Test beer order description")
                 .build();
         testBeerOrder.setId(1);
         testBeerOrder.addBeerOrderLine(testBeerOrderLine);
@@ -132,6 +130,7 @@ class BeerOrderServiceImplTest {
                 .customer(testCustomerDto)
                 .paymentAmount(new BigDecimal("25.98"))
                 .status("NEW")
+                .description("Test beer order description")
                 .beerOrderLines(lines)
                 .build();
     }

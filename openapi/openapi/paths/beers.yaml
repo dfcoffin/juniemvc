@@ -2,7 +2,7 @@ get:
   tags:
     - Beer
   summary: Get all beers
-  description: "Returns a paginated list of beers in the system with optional filtering by beer name."
+  description: "Returns a paginated list of beers in the system with optional filtering by beer name and beer style."
   operationId: getAllBeers
   security:
     - api_key: []
@@ -10,6 +10,12 @@ get:
     - name: beerName
       in: query
       description: Filter beers by name (optional)
+      required: false
+      schema:
+        type: string
+    - name: beerStyle
+      in: query
+      description: Filter beers by style (optional)
       required: false
       schema:
         type: string

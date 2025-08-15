@@ -26,18 +26,20 @@ public class BeerController {
     }
 
     /**
-     * Get all beers with optional filtering by beer name and pagination
+     * Get all beers with optional filtering by beer name, beer style, and pagination
      * @param beerName the beer name to filter by (optional)
+     * @param beerStyle the beer style to filter by (optional)
      * @param page the page number (zero-based, defaults to 0)
      * @param size the page size (defaults to 20)
      * @return Page of beers matching the criteria
      */
     @GetMapping
     public Page<BeerDto> getAllBeers(@RequestParam(required = false) String beerName,
+                                     @RequestParam(required = false) String beerStyle,
                                      @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return beerService.getAllBeers(beerName, pageable);
+        return beerService.getAllBeers(beerName, beerStyle, pageable);
     }
 
     /**
