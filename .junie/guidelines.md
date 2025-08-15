@@ -22,7 +22,7 @@ public class OrderService {
                        RestClient.Builder builder) {
        this.orderRepository = orderRepository;
        this.restClient = builder
-               .baseUrl("https://catalog-service.com")
+               .baseUrl("http://catalog-service.com")
                .requestInterceptor(new ClientCredentialTokenInterceptor())
                .build();
    }
@@ -222,21 +222,21 @@ logger.atDebug()
   * Email schema → `Email.yaml`
 
 **Component Definition:**
-    
+
 * Use `$ref` to reference components from other files:
   * From path files to schemas: `$ref: '../components/schemas/User.yaml'`
   * Between component files: `$ref: './Email.yaml'`
 * Group related components in appropriate subdirectories (e.g., `schemas/`, `responses/`, `parameters/`).
 * Use relative paths for references to maintain portability.
-      
+
 **Testing the OpenAPI Specification:**
 
-  * Run `npm test` in the `openapi` directory to validate the OpenAPI specification.
-  * This command executes `redocly lint` which checks for:
-    * Syntax errors
-    * Semantic errors
-    * Adherence to OpenAPI standards
-    * Broken references
+* Run `npm test` in the `openapi` directory to validate the OpenAPI specification.
+* This command executes `redocly lint` which checks for:
+  * Syntax errors
+  * Semantic errors
+  * Adherence to OpenAPI standards
+  * Broken references
 * Fix any reported issues before committing changes to the API specification.
 * You can also use `npm start` to preview the documentation and `npm run build` to bundle the specification into a single file.
 
@@ -250,9 +250,9 @@ logger.atDebug()
 * Use `@Mapper` to configure the mapping between the two classes.
 * Use `@Mapping` to configure the mapping between the two fields.
 * After modifying a Mapper, recompile the project to generate the new Mapper implementation.
-* Use Mappers to update existing entities.
+* Use Mappers to update existing entities. 
 
 ## 19. Service Operations
-* When updating existing entities, use Mappers to update existing entities. The entity should be fetched from the database
-  and then updated using the mapper before saving the entity back to the database.
+* When updating existing entities, use Mappers to update existing entities. The entity should be fetched from the database 
+  and then updated using the mapper prior to saving the entity back to the database.
 

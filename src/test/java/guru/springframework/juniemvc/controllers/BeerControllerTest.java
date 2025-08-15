@@ -2,17 +2,18 @@ package guru.springframework.juniemvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.juniemvc.models.BeerDto;
+import guru.springframework.juniemvc.models.BeerPatchDto;
 import guru.springframework.juniemvc.services.BeerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,7 +38,7 @@ class BeerControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockBean
     BeerService beerService;
 
     BeerDto testBeer;
@@ -316,7 +318,6 @@ class BeerControllerTest {
         BeerDto invalidBeer = BeerDto.builder()
                 // Missing required fields
                 .beerName("")
-                .description("This is a valid description but other fields are invalid")
                 .beerStyle("")
                 .upc("")
                 .price(new BigDecimal("-1.0"))
@@ -328,5 +329,54 @@ class BeerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidBeer)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testPatchBeer() throws Exception {
+        // Given
+        BeerPatchDto beerPatchDto = BeerPatchDto.builder()
+                .beerName("Patched Beer")
+                .price(new BigDecimal("15.99"))
+                .build();
+
+        BeerDto patchedBeer = BeerDto.builder()
+                .id(1)
+                .beerName("Patched Beer")
+                .description("A test IPA beer") // Unchanged
+                .beerStyle("IPA") // Unchanged
+                .upc("123456") // Unchanged
+                .price(new BigDecimal("15.99"))
+                .quantityOnHand(100) // Unchanged
+                .build();
+
+        given(beerService.patchBeer(eq(1), any(BeerPatchDto.class))).willReturn(Optional.of(patchedBeer));
+
+        // When/Then
+        mockMvc.perform(patch("/api/v1/beers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(beerPatchDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.beerName", is("Patched Beer")))
+                .andExpect(jsonPath("$.price", is(15.99)))
+                .andExpect(jsonPath("$.beerStyle", is("IPA")))
+                .andExpect(jsonPath("$.price", is(15.99)));
+    }
+
+    @Test
+    void testPatchBeerNotFound() throws Exception {
+        // Given
+        BeerPatchDto beerPatchDto = BeerPatchDto.builder()
+                .beerName("Patched Beer")
+                .price(new BigDecimal("15.99"))
+                .build();
+
+        given(beerService.patchBeer(eq(1), any(BeerPatchDto.class))).willReturn(Optional.empty());
+
+        // When/Then
+        mockMvc.perform(patch("/api/v1/beers/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(beerPatchDto)))
+                .andExpect(status().isNotFound());
     }
 }

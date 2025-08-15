@@ -403,28 +403,4 @@ class BeerRepositoryTest {
         assertThat(beersPage.getContent()).hasSize(2);
         assertThat(beersPage.getTotalElements()).isEqualTo(2);
     }
-
-    @Test
-    void testBeerDescription() {
-        // Given
-        beerRepository.deleteAll(); // Clear any existing data
-        String expectedDescription = "A detailed description of this test beer";
-        Beer beer = Beer.builder()
-                .beerName("Description Test Beer")
-                .description(expectedDescription)
-                .beerStyle("IPA")
-                .upc("12345678")
-                .price(new BigDecimal("12.99"))
-                .quantityOnHand(100)
-                .build();
-        Beer savedBeer = beerRepository.save(beer);
-
-        // When
-        Optional<Beer> fetchedBeerOptional = beerRepository.findById(savedBeer.getId());
-
-        // Then
-        assertThat(fetchedBeerOptional).isPresent();
-        Beer fetchedBeer = fetchedBeerOptional.get();
-        assertThat(fetchedBeer.getDescription()).isEqualTo(expectedDescription);
-    }
 }

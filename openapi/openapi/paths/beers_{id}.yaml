@@ -82,6 +82,47 @@ put:
       description: "Unauthorized"
     '404':
       description: "Beer not found"
+patch:
+  tags:
+    - Beer
+  summary: Partially update a beer
+  description: "Partially updates an existing beer identified by its ID. Only the provided fields will be updated."
+  operationId: patchBeer
+  security:
+    - api_key: []
+  requestBody:
+    description: "Partial beer object with only the fields to update"
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/BeerPatchDto.yaml'
+        example:
+          beerName: "Partially Updated Beer"
+          price: 14.99
+  responses:
+    '200':
+      description: "Successfully updated the beer"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/BeerDto.yaml'
+          example:
+            id: 1
+            version: 1
+            createdDate: "2023-01-01T12:00:00Z"
+            updateDate: "2023-01-04T09:30:00Z"
+            beerName: "Partially Updated Beer"
+            beerStyle: "IPA"
+            upc: "0631234200036"
+            quantityOnHand: 100
+            price: 14.99
+    '400':
+      description: "Bad request"
+    '401':
+      description: "Unauthorized"
+    '404':
+      description: "Beer not found"
 delete:
   tags:
     - Beer

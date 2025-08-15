@@ -1,6 +1,7 @@
 package guru.springframework.juniemvc.services;
 
 import guru.springframework.juniemvc.models.BeerDto;
+import guru.springframework.juniemvc.models.BeerPatchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,6 +41,14 @@ public interface BeerService {
      * @return the saved beer
      */
     BeerDto saveBeer(BeerDto beerDto);
+
+    /**
+     * Partially update an existing beer
+     * @param id the beer ID
+     * @param beerPatchDto the beer patch data
+     * @return Optional containing the updated beer if found
+     */
+    Optional<BeerDto> patchBeer(Integer id, BeerPatchDto beerPatchDto);
 
     /**
      * Delete a beer by its ID

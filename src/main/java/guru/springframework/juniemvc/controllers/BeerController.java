@@ -1,6 +1,7 @@
 package guru.springframework.juniemvc.controllers;
 
 import guru.springframework.juniemvc.models.BeerDto;
+import guru.springframework.juniemvc.models.BeerPatchDto;
 import guru.springframework.juniemvc.services.BeerService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -104,5 +105,20 @@ public class BeerController {
 
         beerService.deleteBeerById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Partially update an existing beer
+     * @param id the beer ID
+     * @param beerPatchDto the partial beer data to update
+     * @return ResponseEntity with the updated beer if found, or 404 Not Found
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<BeerDto> patchBeer(@PathVariable Integer id, @RequestBody BeerPatchDto beerPatchDto) {
+        Optional<BeerDto> updatedBeerOptional = beerService.patchBeer(id, beerPatchDto);
+
+        return updatedBeerOptional
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

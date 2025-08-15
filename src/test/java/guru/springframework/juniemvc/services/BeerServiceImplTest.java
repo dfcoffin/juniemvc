@@ -3,6 +3,7 @@ package guru.springframework.juniemvc.services;
 import guru.springframework.juniemvc.entities.Beer;
 import guru.springframework.juniemvc.mappers.BeerMapper;
 import guru.springframework.juniemvc.models.BeerDto;
+import guru.springframework.juniemvc.models.BeerPatchDto;
 import guru.springframework.juniemvc.repositories.BeerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -313,5 +314,79 @@ class BeerServiceImplTest {
 
         // Then
         verify(beerRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    void patchBeerFound() {
+        // Given
+        BeerPatchDto beerPatchDto = BeerPatchDto.builder()
+                .beerName("Patched Beer")
+                .price(new BigDecimal("15.99"))
+                .build();
+
+        Beer existingBeer = Beer.builder()
+                .id(1)
+                .beerName("Original Beer")
+                .beerStyle("IPA")
+                .upc("123456")
+                .price(new BigDecimal("12.99"))
+                .quantityOnHand(100)
+                .description("Original description")
+                .build();
+
+        Beer patchedBeer = Beer.builder()
+                .id(1)
+                .beerName("Patched Beer")
+                .beerStyle("IPA")
+                .upc("123456")
+                .price(new BigDecimal("15.99"))
+                .quantityOnHand(100)
+                .build();
+
+        BeerDto patchedBeerDto = BeerDto.builder()
+                .id(1)
+                .beerName("Patched Beer")
+                .beerStyle("IPA")
+                .upc("123456")
+                .price(new BigDecimal("15.99"))
+                .quantityOnHand(100)
+                .description("Original description")
+                .build();
+
+        when(beerRepository.findById(1)).thenReturn(Optional.of(existingBeer));
+        doNothing().when(beerMapper).updateBeerFromPatchDto(beerPatchDto, existingBeer);
+        when(beerRepository.save(existingBeer)).thenReturn(patchedBeer);
+        when(beerMapper.beerToBeerDto(patchedBeer)).thenReturn(patchedBeerDto);
+
+        // When
+        Optional<BeerDto> result = beerService.patchBeer(1, beerPatchDto);
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get().getBeerName()).isEqualTo("Patched Beer");
+        assertThat(result.get().getPrice()).isEqualTo(new BigDecimal("15.99"));
+        verify(beerRepository, times(1)).findById(1);
+        verify(beerMapper, times(1)).updateBeerFromPatchDto(beerPatchDto, existingBeer);
+        verify(beerRepository, times(1)).save(existingBeer);
+        verify(beerMapper, times(1)).beerToBeerDto(patchedBeer);
+    }
+
+    @Test
+    void patchBeerNotFound() {
+        // Given
+        BeerPatchDto beerPatchDto = BeerPatchDto.builder()
+                .beerName("Patched Beer")
+                .build();
+
+        when(beerRepository.findById(1)).thenReturn(Optional.empty());
+
+        // When
+        Optional<BeerDto> result = beerService.patchBeer(1, beerPatchDto);
+
+        // Then
+        assertThat(result).isEmpty();
+        verify(beerRepository, times(1)).findById(1);
+        verify(beerMapper, never()).updateBeerFromPatchDto(any(), any());
+        verify(beerRepository, never()).save(any());
     }
 }
