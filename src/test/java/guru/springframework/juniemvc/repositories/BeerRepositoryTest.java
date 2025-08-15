@@ -236,4 +236,158 @@ class BeerRepositoryTest {
         assertThat(thirdPage.getContent()).hasSize(5);
         assertThat(thirdPage.getNumber()).isEqualTo(2);
     }
+
+    @Test
+    void testFindAllByBeerNameAndBeerStyleContainingIgnoreCase() {
+        // Given
+        beerRepository.deleteAll(); // Clear any existing data
+        Beer beer1 = Beer.builder()
+                .beerName("Test IPA")
+                .beerStyle("IPA")
+                .upc("111111")
+                .price(new BigDecimal("11.99"))
+                .quantityOnHand(100)
+                .build();
+        Beer beer2 = Beer.builder()
+                .beerName("Test Stout")
+                .beerStyle("Stout")
+                .upc("222222")
+                .price(new BigDecimal("13.99"))
+                .quantityOnHand(200)
+                .build();
+        Beer beer3 = Beer.builder()
+                .beerName("Another IPA")
+                .beerStyle("IPA")
+                .upc("333333")
+                .price(new BigDecimal("10.99"))
+                .quantityOnHand(150)
+                .build();
+        Beer beer4 = Beer.builder()
+                .beerName("Not Matching")
+                .beerStyle("Lager")
+                .upc("444444")
+                .price(new BigDecimal("9.99"))
+                .quantityOnHand(120)
+                .build();
+        beerRepository.saveAll(List.of(beer1, beer2, beer3, beer4));
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // When
+        Page<Beer> beersPage = beerRepository.findAllByBeerNameContainingIgnoreCaseAndBeerStyleContainingIgnoreCase("Test", "IPA", pageable);
+
+        // Then
+        assertThat(beersPage.getContent()).hasSize(1);
+        assertThat(beersPage.getTotalElements()).isEqualTo(1);
+        assertThat(beersPage.getContent().get(0).getBeerName()).isEqualTo("Test IPA");
+        assertThat(beersPage.getContent().get(0).getBeerStyle()).isEqualTo("IPA");
+    }
+
+    @Test
+    void testFindAllByBeerNameAndBeerStyleContainingIgnoreCaseWithEmptyBeerName() {
+        // Given
+        beerRepository.deleteAll(); // Clear any existing data
+        Beer beer1 = Beer.builder()
+                .beerName("Test IPA")
+                .beerStyle("IPA")
+                .upc("111111")
+                .price(new BigDecimal("11.99"))
+                .quantityOnHand(100)
+                .build();
+        Beer beer2 = Beer.builder()
+                .beerName("Another IPA")
+                .beerStyle("IPA")
+                .upc("222222")
+                .price(new BigDecimal("13.99"))
+                .quantityOnHand(200)
+                .build();
+        Beer beer3 = Beer.builder()
+                .beerName("Test Stout")
+                .beerStyle("Stout")
+                .upc("333333")
+                .price(new BigDecimal("10.99"))
+                .quantityOnHand(150)
+                .build();
+        beerRepository.saveAll(List.of(beer1, beer2, beer3));
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // When
+        Page<Beer> beersPage = beerRepository.findAllByBeerNameContainingIgnoreCaseAndBeerStyleContainingIgnoreCase("", "IPA", pageable);
+
+        // Then
+        assertThat(beersPage.getContent()).hasSize(2);
+        assertThat(beersPage.getTotalElements()).isEqualTo(2);
+        assertThat(beersPage.getContent().get(0).getBeerStyle()).isEqualTo("IPA");
+        assertThat(beersPage.getContent().get(1).getBeerStyle()).isEqualTo("IPA");
+    }
+
+    @Test
+    void testFindAllByBeerNameAndBeerStyleContainingIgnoreCaseWithEmptyBeerStyle() {
+        // Given
+        beerRepository.deleteAll(); // Clear any existing data
+        Beer beer1 = Beer.builder()
+                .beerName("Test IPA")
+                .beerStyle("IPA")
+                .upc("111111")
+                .price(new BigDecimal("11.99"))
+                .quantityOnHand(100)
+                .build();
+        Beer beer2 = Beer.builder()
+                .beerName("Test Stout")
+                .beerStyle("Stout")
+                .upc("222222")
+                .price(new BigDecimal("13.99"))
+                .quantityOnHand(200)
+                .build();
+        Beer beer3 = Beer.builder()
+                .beerName("Another Beer")
+                .beerStyle("Lager")
+                .upc("333333")
+                .price(new BigDecimal("10.99"))
+                .quantityOnHand(150)
+                .build();
+        beerRepository.saveAll(List.of(beer1, beer2, beer3));
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // When
+        Page<Beer> beersPage = beerRepository.findAllByBeerNameContainingIgnoreCaseAndBeerStyleContainingIgnoreCase("Test", "", pageable);
+
+        // Then
+        assertThat(beersPage.getContent()).hasSize(2);
+        assertThat(beersPage.getTotalElements()).isEqualTo(2);
+        assertThat(beersPage.getContent().get(0).getBeerName()).contains("Test");
+        assertThat(beersPage.getContent().get(1).getBeerName()).contains("Test");
+    }
+
+    @Test
+    void testFindAllByBeerNameAndBeerStyleContainingIgnoreCaseWithBothEmpty() {
+        // Given
+        beerRepository.deleteAll(); // Clear any existing data
+        Beer beer1 = Beer.builder()
+                .beerName("Test IPA")
+                .beerStyle("IPA")
+                .upc("111111")
+                .price(new BigDecimal("11.99"))
+                .quantityOnHand(100)
+                .build();
+        Beer beer2 = Beer.builder()
+                .beerName("Another Beer")
+                .beerStyle("Stout")
+                .upc("222222")
+                .price(new BigDecimal("13.99"))
+                .quantityOnHand(200)
+                .build();
+        beerRepository.saveAll(List.of(beer1, beer2));
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // When
+        Page<Beer> beersPage = beerRepository.findAllByBeerNameContainingIgnoreCaseAndBeerStyleContainingIgnoreCase("", "", pageable);
+
+        // Then
+        assertThat(beersPage.getContent()).hasSize(2);
+        assertThat(beersPage.getTotalElements()).isEqualTo(2);
+    }
 }

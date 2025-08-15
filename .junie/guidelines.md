@@ -22,7 +22,7 @@ public class OrderService {
                        RestClient.Builder builder) {
        this.orderRepository = orderRepository;
        this.restClient = builder
-               .baseUrl("http://catalog-service.com")
+               .baseUrl("https://catalog-service.com")
                .requestInterceptor(new ClientCredentialTokenInterceptor())
                .build();
    }
@@ -254,5 +254,5 @@ logger.atDebug()
 
 ## 19. Service Operations
 * When updating existing entities, use Mappers to update existing entities. The entity should be fetched from the database
-  and then updated using the mapper prior to saving the entity back to the database.
+  and then updated using the mapper before saving the entity back to the database.
 

@@ -60,7 +60,7 @@ class BeerControllerTest {
         List<BeerDto> beers = Arrays.asList(testBeer);
         Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
 
-        given(beerService.getAllBeers(eq(null), any(Pageable.class))).willReturn(beerPage);
+        given(beerService.getAllBeers(eq(null), eq(null), any(Pageable.class))).willReturn(beerPage);
 
         // When/Then
         mockMvc.perform(get("/api/v1/beers")
@@ -78,7 +78,7 @@ class BeerControllerTest {
         List<BeerDto> beers = Arrays.asList(testBeer);
         Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
 
-        given(beerService.getAllBeers(eq(null), any(Pageable.class))).willReturn(beerPage);
+        given(beerService.getAllBeers(eq(null), eq(null), any(Pageable.class))).willReturn(beerPage);
 
         // When/Then
         mockMvc.perform(get("/api/v1/beers")
@@ -102,7 +102,7 @@ class BeerControllerTest {
         List<BeerDto> beers = Arrays.asList(testBeer);
         Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
 
-        given(beerService.getAllBeers(eq("Test"), any(Pageable.class))).willReturn(beerPage);
+        given(beerService.getAllBeers(eq("Test"), eq(null), any(Pageable.class))).willReturn(beerPage);
 
         // When/Then
         mockMvc.perform(get("/api/v1/beers")
@@ -115,6 +115,59 @@ class BeerControllerTest {
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].id", is(1)))
                 .andExpect(jsonPath("$.content[0].beerName", is("Test Beer")))
+                .andExpect(jsonPath("$.totalElements", is(1)))
+                .andExpect(jsonPath("$.totalPages", is(1)))
+                .andExpect(jsonPath("$.size", is(20)))
+                .andExpect(jsonPath("$.number", is(0)));
+    }
+
+    @Test
+    void testGetAllBeersWithBeerStyleFilter() throws Exception {
+        // Given
+        List<BeerDto> beers = Arrays.asList(testBeer);
+        Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
+
+        given(beerService.getAllBeers(eq(null), eq("IPA"), any(Pageable.class))).willReturn(beerPage);
+
+        // When/Then
+        mockMvc.perform(get("/api/v1/beers")
+                .param("beerStyle", "IPA")
+                .param("page", "0")
+                .param("size", "20")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id", is(1)))
+                .andExpect(jsonPath("$.content[0].beerName", is("Test Beer")))
+                .andExpect(jsonPath("$.content[0].beerStyle", is("IPA")))
+                .andExpect(jsonPath("$.totalElements", is(1)))
+                .andExpect(jsonPath("$.totalPages", is(1)))
+                .andExpect(jsonPath("$.size", is(20)))
+                .andExpect(jsonPath("$.number", is(0)));
+    }
+
+    @Test
+    void testGetAllBeersWithBeerNameAndBeerStyleFilter() throws Exception {
+        // Given
+        List<BeerDto> beers = Arrays.asList(testBeer);
+        Page<BeerDto> beerPage = new PageImpl<>(beers, PageRequest.of(0, 20), 1);
+
+        given(beerService.getAllBeers(eq("Test"), eq("IPA"), any(Pageable.class))).willReturn(beerPage);
+
+        // When/Then
+        mockMvc.perform(get("/api/v1/beers")
+                .param("beerName", "Test")
+                .param("beerStyle", "IPA")
+                .param("page", "0")
+                .param("size", "20")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id", is(1)))
+                .andExpect(jsonPath("$.content[0].beerName", is("Test Beer")))
+                .andExpect(jsonPath("$.content[0].beerStyle", is("IPA")))
                 .andExpect(jsonPath("$.totalElements", is(1)))
                 .andExpect(jsonPath("$.totalPages", is(1)))
                 .andExpect(jsonPath("$.size", is(20)))

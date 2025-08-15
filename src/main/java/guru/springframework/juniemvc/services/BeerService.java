@@ -19,12 +19,13 @@ public interface BeerService {
     List<BeerDto> getAllBeers();
 
     /**
-     * Get all beers with optional filtering by beer name and pagination
+     * Get all beers with optional filtering by beer name and beer style, with pagination
      * @param beerName the beer name to filter by (can be null)
+     * @param beerStyle the beer style to filter by (can be null)
      * @param pageable pagination information
      * @return Page of beers matching the criteria
      */
-    Page<BeerDto> getAllBeers(String beerName, Pageable pageable);
+    Page<BeerDto> getAllBeers(String beerName, String beerStyle, Pageable pageable);
 
     /**
      * Get a beer by its ID

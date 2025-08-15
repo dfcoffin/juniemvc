@@ -35,12 +35,31 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public Page<BeerDto> getAllBeers(String beerName, Pageable pageable) {
-        // If beerName is null or empty, use an empty string to match all beers
-        String searchName = StringUtils.hasText(beerName) ? beerName : "";
+    public Page<BeerDto> getAllBeers(String beerName, String beerStyle, Pageable pageable) {
+        // Handle different combinations of parameters
+        boolean hasName = StringUtils.hasText(beerName);
+        boolean hasStyle = StringUtils.hasText(beerStyle);
 
-        return beerRepository.findAllByBeerNameContainingIgnoreCase(searchName, pageable)
-                .map(beerMapper::beerToBeerDto);
+        Page<Beer> beerPage;
+
+        if (hasName && hasStyle) {
+            // Both parameters provided
+            beerPage = beerRepository.findAllByBeerNameContainingIgnoreCaseAndBeerStyleContainingIgnoreCase(
+                    beerName, beerStyle, pageable);
+        } else if (hasName) {
+            // Only beerName provided
+            beerPage = beerRepository.findAllByBeerNameContainingIgnoreCase(beerName, pageable);
+        } else if (hasStyle) {
+            // Only beerStyle provided - use the combined method with empty string for name
+            beerPage = beerRepository.findAllByBeerNameContainingIgnoreCaseAndBeerStyleContainingIgnoreCase(
+                    "", beerStyle, pageable);
+        } else {
+            // No parameters provided - use the combined method with empty strings
+            beerPage = beerRepository.findAllByBeerNameContainingIgnoreCaseAndBeerStyleContainingIgnoreCase(
+                    "", "", pageable);
+        }
+
+        return beerPage.map(beerMapper::beerToBeerDto);
     }
 
     @Override

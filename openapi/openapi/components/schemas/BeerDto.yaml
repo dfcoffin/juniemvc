@@ -52,6 +52,10 @@ properties:
     format: int32
     minimum: 0
     example: 100
+  description:
+    description: "Description of the beer."
+    type: string
+    example: "A refreshing IPA with citrus notes"
   price:
     description: "Price of the beer."
     type: number
