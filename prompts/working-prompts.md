@@ -1,4 +1,3 @@
-IconIcon
 # Jetbrains AI Prompts
 
 Inspect the requirements document. Analyze for accuracy and completeness. Make recommendations for
@@ -19,7 +18,6 @@ Can the Guide outline be improved?
 
 ---------
 Inspect the requirements.md file. Generate a prompt to create an implementation plan from this file.
-
 
 # Junie Prompts
 Inspect the file `prompts/requirements-prompt-draft.md`. Use this file to create a developer guide to
@@ -95,6 +93,22 @@ Write the task list to `prompts/tasks.md` file.
 
 -------------------------------------
 
-Complete the task list `prompts/tasks.md`. Inspect the `prompts/requirements.md` and `prompts/plan.md` and task.md (task list).
+Complete the task list `prompts/tasks.md`. Use information from `prompts/requirements.md` and `prompts/plan.md` for
+additional context when completing the tasks.
+
 Implement the tasks in the task list. Focus on completing the tasks in order. Mark the task complete as it is done
-using [x]. As each step is completed, it is very important to update the task list mark and the task as done [x]. 
+using [x]. As each step is completed, it is crucial to update the task list mark and the task as done [x]. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,193 @@
+import {describe, expect, it} from 'vitest';
+import {render} from '../../../test/test-utils';
+import {PageContainer} from '../PageContainer';
+import {MemoryRouter} from 'react-router-dom';
+
+// Extend the Vitest types to include our custom matcher
+declare global {
+  namespace Vi {
+    interface AsymmetricMatchersContaining {
+      toHaveNoAccessibilityViolations(): void;
+    }
+    interface Assertion {
+      toHaveNoAccessibilityViolations(): Promise<void>;
+    }
+  }
+}
+
+describe('Layout Components Accessibility', () => {
+  it('PageContainer is accessible', async () => {
+    // Render a page container with breadcrumbs and actions
+    const { container } = render(
+      <MemoryRouter>
+        <PageContainer
+          title="Test Page"
+          description="This is a test page for accessibility testing"
+          breadcrumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Test', to: '/test' }
+          ]}
+          actions={
+            <div>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                aria-label="Primary action"
+              >
+                Primary Action
+              </button>
+              <button
+                className="px-4 py-2 bg-white border border-gray-300 rounded ml-2"
+                aria-label="Secondary action"
+              >
+                Secondary Action
+              </button>
+            </div>
+          }
+        >
+          <div className="p-4 bg-white rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Section Title</h2>
+            <p>This is the content of the page.</p>
+            
+            <div className="mt-4">
+              <label htmlFor="test-input" className="block text-sm font-medium mb-1">
+                Test Input
+              </label>
+              <input
+                id="test-input"
+                type="text"
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="Enter some text"
+              />
+            </div>
+          </div>
+        </PageContainer>
+      </MemoryRouter>
+    );
+    
+    // Run accessibility tests
+    await expect(container).toHaveNoAccessibilityViolations();
+  });
+
+  it('Page with data table is accessible', async () => {
+    // Render a page with a data table
+    const { container } = render(
+      <MemoryRouter>
+        <PageContainer
+          title="Data Table Page"
+          description="This page displays tabular data"
+          breadcrumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Data', to: '/data' }
+          ]}
+        >
+          <div className="p-4 bg-white rounded-lg shadow">
+            <table className="w-full border-collapse">
+              <caption className="sr-only">User Information</caption>
+              <thead>
+                <tr>
+                  <th scope="col" className="px-4 py-2 text-left">Name</th>
+                  <th scope="col" className="px-4 py-2 text-left">Email</th>
+                  <th scope="col" className="px-4 py-2 text-left">Role</th>
+                  <th scope="col" className="px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-4 py-2 border-t">John Doe</td>
+                  <td className="px-4 py-2 border-t">john@example.com</td>
+                  <td className="px-4 py-2 border-t">Administrator</td>
+                  <td className="px-4 py-2 border-t">
+                    <button
+                      className="text-blue-500 hover:text-blue-700 mr-2"
+                      aria-label="Edit John Doe"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      aria-label="Delete John Doe"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 border-t">Jane Smith</td>
+                  <td className="px-4 py-2 border-t">jane@example.com</td>
+                  <td className="px-4 py-2 border-t">User</td>
+                  <td className="px-4 py-2 border-t">
+                    <button
+                      className="text-blue-500 hover:text-blue-700 mr-2"
+                      aria-label="Edit Jane Smith"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      aria-label="Delete Jane Smith"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </PageContainer>
+      </MemoryRouter>
+    );
+    
+    // Run accessibility tests
+    await expect(container).toHaveNoAccessibilityViolations();
+  });
+
+  it('Page with dialog is accessible', async () => {
+    // Render a page with a dialog
+    const { container } = render(
+      <MemoryRouter>
+        <PageContainer
+          title="Dialog Page"
+          breadcrumbs={[{ label: 'Home', to: '/' }]}
+        >
+          <div className="p-4 bg-white rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Dialog Example</h2>
+            
+            {/* Mock dialog */}
+            <div
+              role="dialog"
+              aria-labelledby="dialog-title"
+              aria-describedby="dialog-description"
+              className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            >
+              <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                <h3 id="dialog-title" className="text-lg font-semibold mb-2">
+                  Confirmation
+                </h3>
+                <p id="dialog-description" className="mb-4">
+                  Are you sure you want to proceed with this action?
+                </p>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    className="px-4 py-2 bg-gray-200 rounded"
+                    aria-label="Cancel"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                    aria-label="Confirm"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </PageContainer>
+      </MemoryRouter>
+    );
+    
+    // Run accessibility tests
+    await expect(container).toHaveNoAccessibilityViolations();
+  });
+});
