@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
-import {Outlet} from 'react-router-dom';
-import Header from './Header';
-import Footer from './Footer';
-import Sidebar from './Sidebar';
+import React, {useState} from "react";
+import {Outlet} from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
+import Sidebar from "./Sidebar";
 
 const MainLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

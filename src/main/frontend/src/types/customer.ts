@@ -2,7 +2,7 @@
  * Customer types definitions
  */
 
-import {BeerOrderDto} from './beerOrder';
+import type {BeerOrderDto} from "./beerOrder";
 
 /**
  * Customer interface representing a customer entity

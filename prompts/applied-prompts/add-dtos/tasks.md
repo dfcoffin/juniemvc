@@ -1,51 +1,66 @@
-# DTO Implementation Task List
+# Task List for Adding DTOs to the Beer API
 
-## 1. Create DTO and Mapper
-- [x] 1.1. Create package `guru.springframework.juniemvc.models`
-- [x] 1.2. Create `BeerDto` class with all required properties
-- [x] 1.3. Apply Lombok annotations to `BeerDto`
-- [x] 1.4. Apply Jakarta Validation annotations to `BeerDto` fields
-- [x] 1.5. Create package `guru.springframework.juniemvc.mappers`
-- [x] 1.6. Create `BeerMapper` interface with MapStruct annotations
-- [x] 1.7. Define mapping methods in `BeerMapper`
-- [x] 1.8. Configure mapper to ignore id, createDate, and updateDate when mapping from DTO to entity
-- [x] 1.9. Add MapStruct dependency to pom.xml
+## 1. Create DTO Classes
+- [x] 1.1. Create a new package `guru.springframework.juniemvc.models`
+- [x] 1.2. Create a `BeerDto` class with the following:
+  - [x] 1.2.1. Add properties (id, version, beerName, beerStyle, upc, quantityOnHand, price, createdDate, updateDate)
+  - [x] 1.2.2. Add Lombok annotations (@Data, @NoArgsConstructor, @AllArgsConstructor, @Builder)
+  - [x] 1.2.3. Add Jakarta Validation annotations:
+    - [x] 1.2.3.1. @NotBlank for beerName, beerStyle, and upc
+    - [x] 1.2.3.2. @NotNull for quantityOnHand and price
+    - [x] 1.2.3.3. @PositiveOrZero for quantityOnHand
+    - [x] 1.2.3.4. @Positive for price
+  - [x] 1.2.4. Add appropriate validation error messages
 
-## 2. Update Service Layer
-- [x] 2.1. Modify `BeerService` interface to use `BeerDto` instead of `Beer` entity
-- [x] 2.2. Update `BeerServiceImpl` to inject `BeerMapper`
-- [x] 2.3. Update `BeerServiceImpl` methods to use mapper for entity-DTO conversions
-- [x] 2.4. Update `getAllBeers()` to return a list of `BeerDto` objects
-- [x] 2.5. Update `getBeerById()` to return an Optional of `BeerDto`
-- [x] 2.6. Update `saveBeer()` to accept and return `BeerDto`
-- [x] 2.7. Update `updateBeerById()` to accept `BeerDto` and return Optional of `BeerDto`
-- [x] 2.8. Ensure `deleteBeerById()` still works correctly with the updated service
+## 2. Implement MapStruct Mapper
+- [x] 2.1. Add MapStruct dependencies to pom.xml:
+  - [x] 2.1.1. Add mapstruct dependency
+  - [x] 2.1.2. Add mapstruct-processor dependency
+  - [x] 2.1.3. Configure annotation processor path in maven-compiler-plugin
+- [x] 2.2. Create a new package `guru.springframework.juniemvc.mappers`
+- [x] 2.3. Create a `BeerMapper` interface with:
+  - [x] 2.3.1. Add @Mapper annotation
+  - [x] 2.3.2. Add method to convert from Beer entity to BeerDto
+  - [x] 2.3.3. Add method to convert from BeerDto to Beer entity
+  - [x] 2.3.4. Add @Mapping annotations to ignore id, createdDate, and updateDate fields
 
-## 3. Update Controller Layer
-- [x] 3.1. Modify `BeerController` to use `BeerDto` instead of `Beer` entity
-- [x] 3.2. Update controller method return types to use `BeerDto`
-- [x] 3.3. Update controller method parameter types to use `BeerDto`
-- [x] 3.4. Add `@Valid` annotation to method parameters that accept `BeerDto` objects
-- [x] 3.5. Ensure all endpoints maintain the same REST API contract
+## 3. Update Service Layer
+- [x] 3.1. Modify the `BeerService` interface:
+  - [x] 3.1.1. Update getAllBeers() to return List<BeerDto>
+  - [x] 3.1.2. Update getBeerById() to return Optional<BeerDto>
+  - [x] 3.1.3. Update saveBeer() to accept and return BeerDto
+  - [x] 3.1.4. Keep deleteBeerById() unchanged
+- [x] 3.2. Update `BeerServiceImpl` class:
+  - [x] 3.2.1. Add BeerMapper as a dependency
+  - [x] 3.2.2. Update constructor to inject BeerMapper
+  - [x] 3.2.3. Update getAllBeers() to convert entities to DTOs
+  - [x] 3.2.4. Update getBeerById() to convert entity to DTO
+  - [x] 3.2.5. Update saveBeer() to convert between DTO and entity
+  - [x] 3.2.6. Keep deleteBeerById() unchanged
 
-## 4. Implement Validation Error Handling
-- [x] 4.1. Create package `guru.springframework.juniemvc.exceptions`
-- [x] 4.2. Create `GlobalExceptionHandler` class with `@RestControllerAdvice` annotation
-- [x] 4.3. Implement exception handler for `MethodArgumentNotValidException`
-- [x] 4.4. Implement exception handler for `ConstraintViolationException`
-- [x] 4.5. Return appropriate HTTP status codes and error messages
+## 4. Update Controller Layer
+- [x] 4.1. Modify `BeerController`:
+  - [x] 4.1.1. Update getAllBeers() to return List<BeerDto>
+  - [x] 4.1.2. Update getBeerById() to use BeerDto
+  - [x] 4.1.3. Update createBeer() to accept and return BeerDto
+  - [x] 4.1.4. Add @Valid annotation to request bodies
+  - [x] 4.1.5. Update updateBeer() to use BeerDto
+  - [x] 4.1.6. Update deleteBeer() to use BeerDto for checking existence
 
 ## 5. Update Tests
-- [x] 5.1. Update `BeerControllerTest` to use `BeerDto` instead of `Beer` entity
-- [x] 5.2. Add validation tests for valid DTOs
-- [x] 5.3. Add validation tests for invalid DTOs
-- [x] 5.4. Test the global exception handler for validation errors
-- [x] 5.5. Update `BeerServiceImplTest` to use `BeerDto` instead of `Beer` entity
-- [x] 5.6. Ensure all tests pass with the updated implementation
+- [x] 5.1. Update `BeerControllerTest`:
+  - [x] 5.1.1. Modify test setup to use DTOs instead of entities
+  - [x] 5.1.2. Update assertions to verify DTO properties
+  - [x] 5.1.3. Add tests for validation errors
+  - [x] 5.1.4. Ensure all tests pass with the new implementation
+- [x] 5.2. Update `BeerServiceImplTest`:
+  - [x] 5.2.1. Modify test setup to use DTOs
+  - [x] 5.2.2. Mock the BeerMapper
+  - [x] 5.2.3. Update assertions to verify DTO properties
+  - [x] 5.2.4. Ensure all tests pass with the new implementation
 
-## 6. Documentation and Review
-- [x] 6.1. Update API documentation to reflect DTO usage
-- [x] 6.2. Review code for adherence to best practices
-- [x] 6.3. Verify all requirements have been met
-- [x] 6.4. Perform manual testing of the API endpoints
-- [x] 6.5. Address any issues found during testing
+## 6. Additional Tasks
+- [x] 6.1. Verify all functionality works as expected
+- [x] 6.2. Ensure proper error handling for validation errors
+- [x] 6.3. Review code for any missed conversion points
+- [x] 6.4. Update documentation if necessary

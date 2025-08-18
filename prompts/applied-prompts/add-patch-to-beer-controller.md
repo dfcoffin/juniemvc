@@ -1,22 +1,21 @@
 # Prompt Variables
-Apply the following variables to placeholders in the prompt.  Placeholders are denoted by `${variable}`.
+Apply the following variables to placeholders in the prompt. Placeholders are denoted by `${variable}` syntax.
 
-# Placeholders Definitions
-The following key value pairs are used to replace placeholders in the prompt.  Format variable defines the variable
-name, and value defines the value to replace the placeholder with.  Defined as `variable name` = `value` pairs in the
-following list:
+# Placeholders Definitions.
+The following key value pairs are used to replace placeholders in the prompt. Format variable defines the variable name and
+value defines the value to replace the placeholder with. Defined as `variable name` = `value` pairs in the following list:
 
 * controller_name = `BeerController`
 
 ## Task Description
-Your task is to add a patch operation to the Spring MVC controller `${controller_name}`. Use guidelines from the file `.
-junie/guidelines.md`.
+Your task is to add a patch operation to the Spring MVC controller `${controller_name}`.
 
-### Task Steps
-* Create a new Patch Operation DTO using the naming convention `<EntityName>PatchDto`.
-* The new patch DTO will not have any NotNull or NotBlank constraints.
-* Add an update operation to the Mapstruct mapper which ignores null values using `@BeanMapping
-(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)` on the update method of the mapper.
+To complete this task, complete the following steps:
+* Create a new Patch Operation DTO using the naming convention <EntityName>PatchDto.
+* The new patch DTO will not have any NotNull or NotBlank Constraints
+* Add an update operation to the Mapstruct mapper which ignores null values using
+  `@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)` on the update method
+  of the mapper.
 * Create a new service method which will update an existing entity using the values of the Patch DTO.
 * Add additional mapper, service and MockMVC tests to test the patch operation.
 * Update the OpenAPI documentation for the new operation and DTO.

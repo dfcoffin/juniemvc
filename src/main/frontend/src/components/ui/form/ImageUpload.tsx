@@ -1,30 +1,30 @@
-import React, {forwardRef, useRef, useState} from 'react';
-import {cva, type VariantProps} from 'class-variance-authority';
-import {cn} from '../../../utils/cn';
-import {Image as ImageIcon, Upload, X} from 'lucide-react';
+import React, {forwardRef, useRef, useState} from "react";
+import {cva, type VariantProps} from "class-variance-authority";
+import {cn} from "../../../utils/cn";
+import {Image as ImageIcon, Upload, X} from "lucide-react";
 
 const imageUploadVariants = cva(
-  'flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-md transition-colors',
+  "flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-md transition-colors",
   {
     variants: {
       error: {
-        true: 'border-red-500 bg-red-50',
-        false: 'border-slate-300 bg-slate-50 hover:bg-slate-100',
+        true: "border-red-500 bg-red-50",
+        false: "border-slate-300 bg-slate-50 hover:bg-slate-100",
       },
       hasImage: {
-        true: 'border-green-500 bg-green-50',
-        false: '',
+        true: "border-green-500 bg-green-50",
+        false: "",
       },
     },
     defaultVariants: {
       error: false,
       hasImage: false,
     },
-  }
+  },
 );
 
 export interface ImageUploadProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>,
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">,
     VariantProps<typeof imageUploadVariants> {
   error?: boolean;
   onChange?: (file: File | null) => void;
@@ -33,7 +33,9 @@ export interface ImageUploadProps
 
 const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
   ({ className, error, onChange, defaultPreview, ...props }, ref) => {
-    const [preview, setPreview] = useState<string | null>(defaultPreview || null);
+    const [preview, setPreview] = useState<string | null>(
+      defaultPreview || null,
+    );
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [dragging, setDragging] = useState(false);
 
@@ -64,7 +66,7 @@ const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
       e.stopPropagation();
       setPreview(null);
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
       onChange?.(null);
     };
@@ -93,8 +95,11 @@ const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
             imageUploadVariants({
               error,
               hasImage: !!preview,
-              className: cn(className, dragging ? 'border-blue-500 bg-blue-50' : '')
-            })
+              className: cn(
+                className,
+                dragging ? "border-blue-500 bg-blue-50" : "",
+              ),
+            }),
           )}
           onClick={handleClick}
           onDragOver={handleDragOver}
@@ -127,8 +132,12 @@ const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
                 )}
               </div>
               <div className="text-sm font-medium text-center">
-                {dragging ? 'Drop to upload' : 'Click to upload or drag and drop'}
-                <p className="text-xs text-slate-400 mt-1">PNG, JPG or WEBP (max. 2MB)</p>
+                {dragging
+                  ? "Drop to upload"
+                  : "Click to upload or drag and drop"}
+                <p className="text-xs text-slate-400 mt-1">
+                  PNG, JPG or WEBP (max. 2MB)
+                </p>
               </div>
             </div>
           )}
@@ -138,7 +147,7 @@ const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
           className="hidden"
           ref={(node) => {
             // Handle both the internal ref and the forwarded ref
-            if (typeof ref === 'function') {
+            if (typeof ref === "function") {
               ref(node);
             } else if (ref) {
               ref.current = node;
@@ -151,9 +160,9 @@ const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
         />
       </div>
     );
-  }
+  },
 );
 
-ImageUpload.displayName = 'ImageUpload';
+ImageUpload.displayName = "ImageUpload";
 
 export default ImageUpload;

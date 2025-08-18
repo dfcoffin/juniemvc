@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {render} from '../../../test/test-utils';
-import {PageContainer} from '../PageContainer';
+import PageContainer from '../PageContainer';
 import {MemoryRouter} from 'react-router-dom';
 
 // Extend the Vitest types to include our custom matcher

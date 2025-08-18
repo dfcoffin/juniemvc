@@ -1,5 +1,5 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React from "react";
+import {Link} from "react-router-dom";
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -11,23 +11,38 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Beer Service</h3>
             <p className="text-sm text-slate-400">
-              Manage your beer inventory, customers, and orders with our comprehensive beer service platform.
+              Manage your beer inventory, customers, and orders with our
+              comprehensive beer service platform.
             </p>
           </div>
           <div>
             <h3 className="mb-4 text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/beers" className="text-slate-400 hover:text-white">Beers</Link>
+                <Link to="/beers" className="text-slate-400 hover:text-white">
+                  Beers
+                </Link>
               </li>
               <li>
-                <Link to="/customers" className="text-slate-400 hover:text-white">Customers</Link>
+                <Link
+                  to="/customers"
+                  className="text-slate-400 hover:text-white"
+                >
+                  Customers
+                </Link>
               </li>
               <li>
-                <Link to="/orders" className="text-slate-400 hover:text-white">Orders</Link>
+                <Link to="/orders" className="text-slate-400 hover:text-white">
+                  Orders
+                </Link>
               </li>
               <li>
-                <Link to="/inventory" className="text-slate-400 hover:text-white">Inventory</Link>
+                <Link
+                  to="/inventory"
+                  className="text-slate-400 hover:text-white"
+                >
+                  Inventory
+                </Link>
               </li>
             </ul>
           </div>
@@ -35,13 +50,22 @@ const Footer: React.FC = () => {
             <h3 className="mb-4 text-lg font-semibold">Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/help" className="text-slate-400 hover:text-white">Help Center</Link>
+                <Link to="/help" className="text-slate-400 hover:text-white">
+                  Help Center
+                </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-slate-400 hover:text-white">Contact Us</Link>
+                <Link to="/contact" className="text-slate-400 hover:text-white">
+                  Contact Us
+                </Link>
               </li>
               <li>
-                <Link to="/documentation" className="text-slate-400 hover:text-white">Documentation</Link>
+                <Link
+                  to="/documentation"
+                  className="text-slate-400 hover:text-white"
+                >
+                  Documentation
+                </Link>
               </li>
             </ul>
           </div>

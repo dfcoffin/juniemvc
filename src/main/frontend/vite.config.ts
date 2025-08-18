@@ -1,6 +1,6 @@
-import {defineConfig} from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import {defineConfig} from "vite";
+import react from "@vitejs/plugin-react";
+import * as path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,50 +9,44 @@ export default defineConfig({
     port: 3000,
     hmr: true, // Enable hot module replacement
     proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
+      "/api": {
+        target: "http://localhost:8080",
         changeOrigin: true,
       },
     },
   },
   build: {
-    outDir: '../../resources/static',
+    outDir: "../../resources/static",
     emptyOutDir: true,
     sourcemap: true,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    minify: "terser",
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
+          vendor: ["react", "react-dom"],
           ui: [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-toast',
-            'lucide-react',
-            'class-variance-authority',
-            'clsx',
-            'tailwind-merge'
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-toast",
+            "lucide-react",
+            "class-variance-authority",
+            "clsx",
+            "tailwind-merge",
           ],
         },
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.');
-          let extType = info[info.length - 1];
+          const info = assetInfo.name?.split(".") || [];
+          let extType = info.length > 0 ? info[info.length - 1] : "";
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            extType = 'img';
+            extType = "img";
           } else if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
-            extType = 'fonts';
+            extType = "fonts";
           }
           return `assets/${extType}/[name]-[hash][extname]`;
         },
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
+        chunkFileNames: "assets/js/[name]-[hash].js",
+        entryFileNames: "assets/js/[name]-[hash].js",
       },
     },
     chunkSizeWarningLimit: 1000,
@@ -60,7 +54,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
+      src: path.resolve(__dirname, "./src"),
     },
   },
-})
+});

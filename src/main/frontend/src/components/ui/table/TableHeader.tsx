@@ -1,45 +1,49 @@
-import React, {ThHTMLAttributes} from 'react';
-import {cn} from '../../../utils/cn';
+import React, {ThHTMLAttributes} from "react";
+import {cn} from "../../../utils/cn";
 
 // TableHeader component
-interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+interface TableHeaderProps
+  extends React.HTMLAttributes<HTMLTableSectionElement> {
   children: React.ReactNode;
 }
 
-export const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
-  ({ className, children, ...props }, ref) => (
-    <thead ref={ref} className={cn('bg-slate-50', className)} {...props}>
-      {children}
-    </thead>
-  )
-);
+export const TableHeader = React.forwardRef<
+  HTMLTableSectionElement,
+  TableHeaderProps
+>(({ className, children, ...props }, ref) => (
+  <thead ref={ref} className={cn("bg-slate-50", className)} {...props}>
+    {children}
+  </thead>
+));
 
-TableHeader.displayName = 'TableHeader';
+TableHeader.displayName = "TableHeader";
 
 // TableHeaderRow component
-interface TableHeaderRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+interface TableHeaderRowProps
+  extends React.HTMLAttributes<HTMLTableRowElement> {
   children: React.ReactNode;
 }
 
-export const TableHeaderRow = React.forwardRef<HTMLTableRowElement, TableHeaderRowProps>(
-  ({ className, children, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn('border-b border-slate-200 transition-colors', className)}
-      {...props}
-    >
-      {children}
-    </tr>
-  )
-);
+export const TableHeaderRow = React.forwardRef<
+  HTMLTableRowElement,
+  TableHeaderRowProps
+>(({ className, children, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn("border-b border-slate-200 transition-colors", className)}
+    {...props}
+  >
+    {children}
+  </tr>
+));
 
-TableHeaderRow.displayName = 'TableHeaderRow';
+TableHeaderRow.displayName = "TableHeaderRow";
 
 // TableHead component for header cells
 interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
   children: React.ReactNode;
   sortable?: boolean;
-  sorted?: 'asc' | 'desc' | null;
+  sorted?: "asc" | "desc" | null;
   onSort?: () => void;
 }
 
@@ -48,9 +52,9 @@ export const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
     <th
       ref={ref}
       className={cn(
-        'h-12 px-4 text-left align-middle font-medium text-slate-700',
-        sortable && 'cursor-pointer select-none',
-        className
+        "h-12 px-4 text-left align-middle font-medium text-slate-700",
+        sortable && "cursor-pointer select-none",
+        className,
       )}
       onClick={sortable ? onSort : undefined}
       {...props}
@@ -59,7 +63,7 @@ export const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
         {children}
         {sortable && (
           <div className="ml-1">
-            {sorted === 'asc' && (
+            {sorted === "asc" && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -75,7 +79,7 @@ export const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
                 <path d="m18 15-6-6-6 6" />
               </svg>
             )}
-            {sorted === 'desc' && (
+            {sorted === "desc" && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -111,10 +115,10 @@ export const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
         )}
       </div>
     </th>
-  )
+  ),
 );
 
-TableHead.displayName = 'TableHead';
+TableHead.displayName = "TableHead";
 
 export default {
   Header: TableHeader,

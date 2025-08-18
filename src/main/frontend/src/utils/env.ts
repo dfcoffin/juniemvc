@@ -17,8 +17,8 @@ export interface EnvironmentConfig {
  */
 export const getEnvConfig = (): EnvironmentConfig => {
   return {
-    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || '/api/v1',
-    environment: import.meta.env.VITE_ENV || 'development',
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "",
+    environment: import.meta.env.VITE_ENV || "development",
   };
 };
 
@@ -27,7 +27,7 @@ export const getEnvConfig = (): EnvironmentConfig => {
  * @returns true if the current environment is development
  */
 export const isDevelopment = (): boolean => {
-  return getEnvConfig().environment === 'development';
+  return getEnvConfig().environment === "development";
 };
 
 /**
@@ -35,7 +35,7 @@ export const isDevelopment = (): boolean => {
  * @returns true if the current environment is test
  */
 export const isTest = (): boolean => {
-  return getEnvConfig().environment === 'test';
+  return getEnvConfig().environment === "test";
 };
 
 /**
@@ -43,5 +43,5 @@ export const isTest = (): boolean => {
  * @returns true if the current environment is production
  */
 export const isProduction = (): boolean => {
-  return getEnvConfig().environment === 'production';
+  return getEnvConfig().environment === "production";
 };

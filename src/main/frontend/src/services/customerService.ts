@@ -1,5 +1,5 @@
-import {apiService} from '../api/axiosConfig';
-import {Customer, CustomerDto, CustomerPage, CustomerPatchDto} from '../types/customer';
+import {apiService} from "../api/axiosConfig";
+import type {Customer, CustomerDto, CustomerPage, CustomerPatchDto,} from "@/types/customer";
 
 /**
  * Customer service for handling customer-related API operations
@@ -15,16 +15,16 @@ export const CustomerService = {
   getCustomers: (
     pageNumber: number = 0,
     pageSize: number = 25,
-    name?: string
+    name?: string,
   ): Promise<CustomerPage> => {
-    const params: Record<string, any> = {
+    const params: Record<string, number | string | undefined> = {
       pageNumber,
       pageSize,
     };
 
     if (name) params.name = name;
 
-    return apiService.get<CustomerPage>('/api/v1/customers', { params });
+    return apiService.get<CustomerPage>("/api/v1/customers", { params });
   },
 
   /**
@@ -42,7 +42,7 @@ export const CustomerService = {
    * @returns Promise with the created customer
    */
   createCustomer: (customerDto: CustomerDto): Promise<Customer> => {
-    return apiService.post<Customer>('/api/v1/customers', customerDto);
+    return apiService.post<Customer>("/api/v1/customers", customerDto);
   },
 
   /**
@@ -61,8 +61,14 @@ export const CustomerService = {
    * @param customerPatchDto - The partial customer data to update
    * @returns Promise with the updated customer
    */
-  patchCustomer: (id: number, customerPatchDto: CustomerPatchDto): Promise<Customer> => {
-    return apiService.patch<Customer>(`/api/v1/customers/${id}`, customerPatchDto);
+  patchCustomer: (
+    id: number,
+    customerPatchDto: CustomerPatchDto,
+  ): Promise<Customer> => {
+    return apiService.patch<Customer>(
+      `/api/v1/customers/${id}`,
+      customerPatchDto,
+    );
   },
 
   /**
@@ -80,8 +86,8 @@ export const CustomerService = {
    * @returns Promise with the customer's beer orders
    */
   getCustomerBeerOrders: (id: number): Promise<Customer> => {
-    return apiService.get<Customer>(`/api/v1/customers/${id}/orders`);
-  }
+    return apiService.get<Customer>(`/api/v1/customers/${id}/beer-orders`);
+  },
 };
 
 export default CustomerService;

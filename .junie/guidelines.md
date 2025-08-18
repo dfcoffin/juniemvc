@@ -256,3 +256,331 @@ logger.atDebug()
 * When updating existing entities, use Mappers to update existing entities. The entity should be fetched from the database 
   and then updated using the mapper prior to saving the entity back to the database.
 
+## 20. Frontend Project Structure and Organization
+
+* Organize the React frontend in `src/main/frontend` directory within the Spring Boot project structure.
+* Use a feature-based directory structure with clear separation of concerns:
+  - `src/components/` - Reusable UI components organized by category (ui, forms, tables, dialogs, etc.)
+  - `src/pages/` - Page-level components representing different routes
+  - `src/services/` - API service layer for backend communication
+  - `src/hooks/` - Custom React hooks for shared logic
+  - `src/utils/` - Utility functions and helpers
+  - `src/types/` - TypeScript type definitions
+  - `src/layouts/` - Layout components for different page structures
+
+**Explanation:**
+
+* **Clear separation of concerns:** Organizing code by feature and responsibility makes it easier to locate, maintain, and test specific functionality.
+* **Scalability:** This structure supports growth as the application expands, allowing teams to work on different features without conflicts.
+* **Reusability:** Separating reusable components from page-specific logic promotes code reuse and consistency across the application.
+
+## 21. Frontend Build Integration with Maven
+
+* Use the `frontend-maven-plugin` to integrate the React build process with the Maven lifecycle.
+* Configure Node.js and npm versions explicitly in the `pom.xml` properties section.
+* Set up Maven executions to install Node/npm, install dependencies, and build the frontend during the appropriate Maven phases.
+* Configure the build output directory to `target/classes/static` so Spring Boot can serve the frontend assets.
+
+**Maven Configuration Example:**
+
+  ```xml
+<properties>
+    <node.version>v22.16.0</node.version>
+    <npm.version>11.4.0</npm.version>
+    <frontend-maven-plugin.version>1.13.4</frontend-maven-plugin.version>
+</properties>
+
+  <plugin>
+    <groupId>com.github.eirslett</groupId>
+    <artifactId>frontend-maven-plugin</artifactId>
+    <version>${frontend-maven-plugin.version}</version>
+    <configuration>
+      <workingDirectory>src/main/frontend</workingDirectory>
+      <installDirectory>target</installDirectory>
+    </configuration>
+    <executions>
+        <execution>
+            <id>install-node-npm</id>
+            <goals><goal>install-node-and-npm</goal></goals>
+            <phase>generate-resources</phase>
+        </execution>
+        <execution>
+            <id>npm-install</id>
+            <goals><goal>npm</goal></goals>
+            <phase>generate-resources</phase>
+            <configuration><arguments>install</arguments></configuration>
+        </execution>
+        <execution>
+            <id>npm-build</id>
+            <goals><goal>npm</goal></goals>
+            <phase>prepare-package</phase>
+            <configuration><arguments>run build</arguments></configuration>
+        </execution>
+    </executions>
+  </plugin>
+  ```
+
+**Explanation:**
+
+* **Unified build process:** Integrating frontend builds with Maven ensures that `mvn clean install` builds both backend and frontend, simplifying CI/CD pipelines.
+* **Consistent environments:** Pinning Node.js and npm versions ensures consistent builds across different development machines and environments.
+* **Automatic asset serving:** Building to `target/classes/static` allows Spring Boot to automatically serve frontend assets without additional configuration.
+
+## 22. React Component Architecture with Shadcn/UI
+
+* Use Shadcn/UI components built on Radix UI primitives for consistent, accessible UI components.
+* Organize UI components in a dedicated `components/ui/` directory with proper exports through an index file.
+* Implement component composition patterns using Radix UI's slot-based architecture.
+* Use Tailwind CSS with CSS custom properties for theming and consistent design tokens.
+
+**Component Structure Example:**
+
+```typescript
+// components/ui/button.tsx
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+```
+
+**Explanation:**
+
+* **Accessibility by default:** Radix UI primitives provide keyboard navigation, focus management, and ARIA attributes out of the box.
+* **Consistent design system:** Using class-variance-authority with Tailwind creates a systematic approach to component variants and styling.
+* **Composition over inheritance:** The slot pattern allows flexible component composition while maintaining type safety.
+
+## 23. API Integration and Service Layer Architecture
+
+* Create a centralized API service using Axios with interceptors for authentication, logging, and error handling.
+* Implement service modules for each domain (beers, customers, orders) with consistent patterns.
+* Use TypeScript interfaces generated from OpenAPI specifications for type safety.
+* Implement proper error handling with user-friendly error messages and logging.
+
+**API Service Pattern:**
+
+```typescript
+// services/api.ts
+class ApiService {
+  private api: AxiosInstance;
+
+  constructor() {
+    this.api = axios.create({
+      baseURL: env.API_URL || '/api',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      timeout: 30000,
+    });
+    this.setupInterceptors();
+  }
+
+  private setupInterceptors(): void {
+    // Request interceptor for authentication
+    this.api.interceptors.request.use((config) => {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+
+    // Response interceptor for error handling
+    this.api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        handleApiError(error);
+        return Promise.reject(error);
+      }
+    );
+  }
+}
+```
+
+**Explanation:**
+
+* **Centralized configuration:** A single API service ensures consistent configuration, authentication, and error handling across all API calls.
+* **Type safety:** Using generated TypeScript types from OpenAPI specifications prevents runtime errors and improves developer experience.
+* **Separation of concerns:** Domain-specific service modules keep API logic organized and maintainable.
+
+## 24. Frontend Testing Strategy
+
+* Use Jest with React Testing Library for unit and integration testing.
+* Configure Jest with jsdom environment for DOM testing.
+* Write tests for components, hooks, and service functions.
+* Use identity-obj-proxy for CSS module mocking in tests.
+
+**Jest Configuration:**
+
+```javascript
+// jest.config.js
+export default {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/test/setupTests.ts'],
+  moduleNameMapping: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@components/(.*)$': '<rootDir>/src/components/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/main.tsx',
+    '!src/vite-env.d.ts',
+  ],
+};
+```
+
+**Explanation:**
+
+* **Component testing:** React Testing Library promotes testing components from the user's perspective, focusing on behavior rather than implementation details.
+* **Type safety in tests:** Using ts-jest ensures TypeScript compilation and type checking in test files.
+* **Comprehensive coverage:** Collecting coverage from all source files helps identify untested code paths.
+
+## 25. Frontend Development Workflow and Code Quality
+
+* Use ESLint with TypeScript and React-specific rules for code quality enforcement.
+* Configure Prettier for consistent code formatting across the team.
+* Set up Husky with lint-staged for pre-commit hooks to ensure code quality.
+* Use environment-specific configuration files for different deployment targets.
+
+**Code Quality Configuration:**
+
+```javascript
+// eslint.config.js
+export default [
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    plugins: {
+      '@typescript-eslint': typescriptEslint,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/no-unused-vars': 'error',
+    },
+  },
+];
+```
+
+**Explanation:**
+
+* **Consistent code style:** Automated formatting and linting ensure consistent code style across the team, reducing review overhead.
+* **Early error detection:** Pre-commit hooks catch issues before they reach the repository, maintaining code quality.
+* **React-specific rules:** React Hooks rules prevent common React pitfalls and ensure proper hook usage.
+
+## 26. Frontend Build Optimization and Performance
+
+* Configure Vite with proper code splitting and chunk optimization for production builds.
+* Use manual chunks to separate vendor libraries from application code.
+* Implement proper asset optimization with appropriate file naming and caching strategies.
+* Configure environment-specific build optimizations (source maps, minification, console removal).
+
+**Vite Build Configuration:**
+
+  ```typescript
+  // vite.config.ts
+  export default defineConfig({
+    build: {
+    outDir: '../../../target/classes/static',
+    sourcemap: process.env.NODE_ENV !== 'production',
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+      },
+    },
+  },
+  });
+  ```
+
+**Explanation:**
+
+* **Optimized loading:** Code splitting and manual chunks reduce initial bundle size and improve loading performance.
+* **Caching strategy:** Hash-based file names enable long-term caching while ensuring cache invalidation when files change.
+* **Production optimization:** Environment-specific configurations ensure optimal builds for different deployment scenarios.
+
+## 27. Frontend Environment Configuration and Deployment
+
+* Use environment-specific configuration files (`.env`, `.env.development`, `.env.production`) for different deployment targets.
+* Configure proxy settings in development to forward API requests to the Spring Boot backend.
+* Set up proper path aliases in both Vite and TypeScript configurations for clean imports.
+* Ensure frontend assets are properly served by Spring Boot in production.
+
+**Environment Configuration:**
+
+```bash
+# .env.development
+VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_LOG_LEVEL=debug
+
+# .env.production  
+VITE_API_BASE_URL=/api/v1
+VITE_LOG_LEVEL=error
+```
+
+**Explanation:**
+
+* **Environment flexibility:** Different configurations for development, testing, and production environments ensure proper behavior in each context.
+* **Development efficiency:** Proxy configuration eliminates CORS issues during development while maintaining production-like API interactions.
+* **Clean imports:** Path aliases improve code readability and make refactoring easier by avoiding relative path complexity.
+
+These additional guidelines provide comprehensive coverage of the frontend implementation patterns, build processes, and best practices that have been implemented in this project. They complement the existing Spring Boot guidelines and provide a complete development framework for full-stack Spring Boot applications with React frontends.

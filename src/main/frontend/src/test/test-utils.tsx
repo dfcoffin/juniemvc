@@ -1,16 +1,17 @@
-import React, {ReactElement} from 'react';
-import {render, RenderOptions} from '@testing-library/react';
-import {BrowserRouter} from 'react-router-dom';
-import {ToastProvider} from '../components/ui/dialog';
-import userEvent from '@testing-library/user-event';
+/* eslint-disable react-refresh/only-export-components */
+import type {ReactElement} from "react";
+import React from "react";
+import type {RenderOptions} from "@testing-library/react";
+import {render} from "@testing-library/react";
+import {BrowserRouter} from "react-router-dom";
+import {ToastProvider} from "../components/ui/dialog";
+import userEvent from "@testing-library/user-event";
 
 // Define wrapper providers for testing
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <BrowserRouter>
-      <ToastProvider>
-        {children}
-      </ToastProvider>
+      <ToastProvider>{children}</ToastProvider>
     </BrowserRouter>
   );
 };
@@ -18,7 +19,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 // Custom render function with providers
 const customRender = (
   ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>,
+  options?: Omit<RenderOptions, "wrapper">,
 ) => {
   return {
     user: userEvent.setup(),
@@ -31,12 +32,12 @@ const mockApiResponse = <T,>(data: T, status = 200) => {
   return Promise.resolve({
     data,
     status,
-    statusText: status === 200 ? 'OK' : 'Error',
+    statusText: status === 200 ? "OK" : "Error",
   });
 };
 
 // Mock error response
-const mockApiError = (status = 400, message = 'Bad Request') => {
+const mockApiError = (status = 400, message = "Bad Request") => {
   return Promise.reject({
     response: {
       status,
@@ -49,7 +50,7 @@ const mockApiError = (status = 400, message = 'Bad Request') => {
 // Helper to wait for element to be removed
 const waitForElementToBeRemoved = async (element: Element | null) => {
   if (!element) return;
-  
+
   return new Promise<void>((resolve) => {
     const observer = new MutationObserver(() => {
       if (!document.body.contains(element)) {
@@ -57,12 +58,12 @@ const waitForElementToBeRemoved = async (element: Element | null) => {
         resolve();
       }
     });
-    
+
     observer.observe(document.body, {
       childList: true,
       subtree: true,
     });
-    
+
     // Check immediately in case element is already removed
     if (!document.body.contains(element)) {
       observer.disconnect();
@@ -72,5 +73,10 @@ const waitForElementToBeRemoved = async (element: Element | null) => {
 };
 
 // Export custom utilities
-export * from '@testing-library/react';
-export { customRender as render, mockApiResponse, mockApiError, waitForElementToBeRemoved };
+export * from "@testing-library/react";
+export {
+  customRender as render,
+  mockApiResponse,
+  mockApiError,
+  waitForElementToBeRemoved,
+};

@@ -182,6 +182,7 @@
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<configuration>
+					<failOnError>false</failOnError>
 					<filesets>
 						<fileset>
 							<directory>${project.basedir}/src/main/frontend/dist</directory>

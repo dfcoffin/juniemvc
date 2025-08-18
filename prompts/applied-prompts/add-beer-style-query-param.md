@@ -1,4 +1,3 @@
-IconIcon
 # Prompt Variables
 Apply the following variables to placeholders in the prompt. Placeholders are denoted by `${variable}` syntax.
 

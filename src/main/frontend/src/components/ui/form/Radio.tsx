@@ -1,5 +1,5 @@
-import React, {forwardRef, InputHTMLAttributes} from 'react';
-import {cn} from '../../../utils/cn';
+import React, {forwardRef, InputHTMLAttributes} from "react";
+import {cn} from "../../../utils/cn";
 
 export interface RadioProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -14,8 +14,8 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
           id={id}
           ref={ref}
           className={cn(
-            'h-4 w-4 rounded-full border border-slate-200 text-slate-900 ring-offset-white focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-            className
+            "h-4 w-4 rounded-full border border-slate-200 text-slate-900 ring-offset-white focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            className,
           )}
           {...props}
         />
@@ -29,20 +29,20 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 export const RadioGroup: React.FC<{
   children: React.ReactNode;
   className?: string;
-  orientation?: 'horizontal' | 'vertical';
-}> = ({ children, className, orientation = 'vertical' }) => {
+  orientation?: "horizontal" | "vertical";
+}> = ({ children, className, orientation = "vertical" }) => {
   return (
     <div
       className={cn(
-        'flex gap-4',
-        orientation === 'horizontal' ? 'flex-row' : 'flex-col',
-        className
+        "flex gap-4",
+        orientation === "horizontal" ? "flex-row" : "flex-col",
+        className,
       )}
     >
       {children}
@@ -50,6 +50,6 @@ export const RadioGroup: React.FC<{
   );
 };
 
-Radio.displayName = 'Radio';
+Radio.displayName = "Radio";
 
 export default Radio;
