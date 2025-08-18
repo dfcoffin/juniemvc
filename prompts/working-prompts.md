@@ -99,8 +99,27 @@ additional context when completing the tasks.
 Implement the tasks in the task list. Focus on completing the tasks in order. Mark the task complete as it is done
 using [x]. As each step is completed, it is crucial to update the task list mark and the task as done [x]. 
 
+-----------------------------------
+**RUN THIS IN ASK MODE**
+Inspect the files `prompts/requirements.md` and `prompts/plan.md`. These changes have been implemented in the project.
+Review the project as needed. Plan additional sections in the guideline.md file for the changes which have been
+implemented in the project. Include instructions for the project structure, and for building and testing the frontend project.
+Also identify any best practices used for the front end code.
 
+-----------------------------------
+**CHANGE BACK TO CODE MODE**
+The frontend project has build errors. Fix errors, verify tests are passing.
 
+-----------------------------------
+
+The command `npm test` is failing, fix test errors, verify all tests are passing
+
+-----------------------------------
+
+The command `npm lint` is shows lint errors, inspect the lint errors and fix, verify there are no lint errors
+
+-----------------------------------
+Update eslint configuration to disable the warning for `Unused eslint-disable directive`
 
 
 

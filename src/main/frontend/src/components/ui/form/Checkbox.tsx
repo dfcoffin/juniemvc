@@ -1,6 +1,6 @@
-import React, {forwardRef, InputHTMLAttributes} from 'react';
-import {cn} from '../../../utils/cn';
-import {Check} from 'lucide-react';
+import React, {forwardRef, InputHTMLAttributes} from "react";
+import {cn} from "../../../utils/cn";
+import {Check} from "lucide-react";
 
 export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -16,8 +16,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             id={id}
             ref={ref}
             className={cn(
-              'peer h-4 w-4 shrink-0 appearance-none rounded-sm border border-slate-200 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-              className
+              "peer h-4 w-4 shrink-0 appearance-none rounded-sm border border-slate-200 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+              className,
             )}
             {...props}
           />
@@ -33,9 +33,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
-Checkbox.displayName = 'Checkbox';
+Checkbox.displayName = "Checkbox";
 
 export default Checkbox;

@@ -81,6 +81,23 @@ paths:
   '/api/v1/customers/{id}':
     $ref: 'paths/customers_{id}.yaml'
 components:
+  schemas:
+    BeerDto:
+      $ref: 'components/schemas/BeerDto.yaml'
+    BeerPatchDto:
+      $ref: 'components/schemas/BeerPatchDto.yaml'
+    BeerOrderDto:
+      $ref: 'components/schemas/BeerOrderDto.yaml'
+    BeerOrderLineDto:
+      $ref: 'components/schemas/BeerOrderLineDto.yaml'
+    BeerOrderShipmentDto:
+      $ref: 'components/schemas/BeerOrderShipmentDto.yaml'
+    CustomerDto:
+      $ref: 'components/schemas/CustomerDto.yaml'
+    Page:
+      $ref: 'components/schemas/Page.yaml'
+    PageOfBeerDto:
+      $ref: 'components/schemas/PageOfBeerDto.yaml'
   securitySchemes:
     main_auth:
       description: "Example description text of the OAuth2 scheme."

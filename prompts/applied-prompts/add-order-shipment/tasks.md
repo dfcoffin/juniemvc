@@ -1,113 +1,106 @@
-# Beer Order Shipment Implementation Task List
+# BeerOrderShipment Implementation Tasks
 
-## 1. Entity Implementation
-1. [x] Create `BeerOrderShipment` entity class in `guru.springframework.juniemvc.entities` package
-   - [x] Extend `BaseEntity` class
-   - [x] Add `shipmentDate` (LocalDateTime) field with not null constraint
-   - [x] Add `carrier` (String) field
-   - [x] Add `trackingNumber` (String) field
-   - [x] Add ManyToOne relationship with `BeerOrder` entity
-   - [x] Add JPA annotations
-   - [x] Add Lombok annotations (@Getter, @Setter, @Builder, etc.)
+## 1. Create BeerOrderShipment Entity
+- [x] 1.1. Create BeerOrderShipment Entity Class
+  - [x] Create a new entity class `BeerOrderShipment` in the `guru.springframework.juniemvc.entities` package
+  - [x] Extend `BaseEntity` to inherit common fields (id, version, createdDate, updateDate)
+  - [x] Add required properties:
+    - [x] `shipmentDate` (LocalDateTime) - not null
+    - [x] `carrier` (String)
+    - [x] `trackingNumber` (String)
+  - [x] Add ManyToOne relationship with BeerOrder
+  - [x] Add Lombok annotations (@Getter, @Setter, @NoArgsConstructor, @AllArgsConstructor, @Builder)
+  - [x] Add JPA annotations (@Entity, @ManyToOne, @JoinColumn)
 
-2. [x] Update `BeerOrder` entity
-   - [x] Add OneToMany relationship field for BeerOrderShipments with cascade and orphan removal
-   - [x] Add helper method `addBeerOrderShipment(BeerOrderShipment shipment)`
-   - [x] Add helper method `removeBeerOrderShipment(BeerOrderShipment shipment)`
+- [x] 1.2. Update BeerOrder Entity
+  - [x] Add OneToMany relationship to BeerOrderShipment
+  - [x] Add helper methods for adding and removing shipments (similar to BeerOrderLine)
 
-## 2. Database Migration
-3. [x] Create Flyway migration script `V3__add_beer_order_shipment_table.sql`
-   - [x] Create `beer_order_shipment` table with required columns
-   - [x] Add foreign key constraint to establish relationship with `BeerOrder`
+## 2. Create Flyway Migration Script
+- [x] 2.1. Create Migration Script
+  - [x] Create a new migration script `V3__add_beer_order_shipment_table.sql` in `src/main/resources/db/migration`
+  - [x] Create the beer_order_shipment table with all required columns
+  - [x] Add foreign key constraint to reference beer_order table
 
-## 3. DTO Implementation
-4. [x] Create `BeerOrderShipmentDto` class in `guru.springframework.juniemvc.models` package
-   - [x] Extend `BaseEntityDto` class
-   - [x] Add fields matching entity: `shipmentDate`, `carrier`, `trackingNumber`
-   - [x] Add validation annotations (@NotNull for shipmentDate)
-   - [x] Add Lombok annotations (@Getter, @Setter, @SuperBuilder, etc.)
+## 3. Create DTOs
+- [x] 3.1. Create BeerOrderShipmentDto
+  - [x] Create a new DTO class `BeerOrderShipmentDto` in the `guru.springframework.juniemvc.models` package
+  - [x] Extend `BaseEntityDto`
+  - [x] Add properties matching the entity (shipmentDate, carrier, trackingNumber)
+  - [x] Add Lombok annotations (@Getter, @Setter, @NoArgsConstructor, @AllArgsConstructor, @Builder)
 
-5. [x] Update `BeerOrderDto` class
-   - [x] Add field for shipments: `Set<BeerOrderShipmentDto> beerOrderShipments`
-   - [x] Update constructors and builder
+## 4. Create Mappers
+- [x] 4.1. Create BeerOrderShipmentMapper
+  - [x] Create a new mapper interface `BeerOrderShipmentMapper` in the `guru.springframework.juniemvc.mappers` package
+  - [x] Use MapStruct to generate the implementation
+  - [x] Add methods for mapping between entity and DTO in both directions
 
-## 4. Mapper Implementation
-6. [x] Create `BeerOrderShipmentMapper` interface in `guru.springframework.juniemvc.mappers` package
-   - [x] Add @Mapper annotation with Spring component model
-   - [x] Define entity-to-DTO conversion method
-   - [x] Define DTO-to-entity conversion method
-   - [x] Define update method
+- [x] 4.2. Update BeerOrderMapper
+  - [x] Update the BeerOrderMapper to include mapping for the shipments collection
 
-7. [x] Update `BeerOrderMapper` interface
-   - [x] Add BeerOrderShipmentMapper to the `uses` attribute
-   - [x] Update mapping methods to include shipments field
+## 5. Create Repository
+- [x] 5.1. Create BeerOrderShipmentRepository
+  - [x] Create a new repository interface `BeerOrderShipmentRepository` in the `guru.springframework.juniemvc.repositories` package
+  - [x] Extend JpaRepository with BeerOrderShipment and Integer types
+  - [x] Add method to find shipments by beer order id
 
-## 5. Repository Implementation
-8. [x] Create `BeerOrderShipmentRepository` interface in `guru.springframework.juniemvc.repositories` package
-   - [x] Extend JpaRepository<BeerOrderShipment, Integer>
-   - [x] Add @Repository annotation
-   - [x] Add custom query methods if needed
+## 6. Create Service Layer
+- [x] 6.1. Create BeerOrderShipmentService Interface
+  - [x] Create a new service interface `BeerOrderShipmentService` in the `guru.springframework.juniemvc.services` package
+  - [x] Define CRUD operations for BeerOrderShipment
+  - [x] Include methods that take beerOrderId as a parameter
 
-## 6. Service Implementation
-9. [x] Create `BeerOrderShipmentService` interface in `guru.springframework.juniemvc.services` package
-   - [x] Define method `List<BeerOrderShipmentDto> getAllShipmentsByBeerOrderId(Integer beerOrderId)`
-   - [x] Define method `Optional<BeerOrderShipmentDto> getShipmentById(Integer id)`
-   - [x] Define method `BeerOrderShipmentDto saveShipment(Integer beerOrderId, BeerOrderShipmentDto beerOrderShipmentDto)`
-   - [x] Define method `void deleteShipmentById(Integer id)`
+- [x] 6.2. Create BeerOrderShipmentServiceImpl
+  - [x] Create a new service implementation `BeerOrderShipmentServiceImpl` in the `guru.springframework.juniemvc.services` package
+  - [x] Implement the BeerOrderShipmentService interface
+  - [x] Use constructor injection for dependencies (repository, mapper)
+  - [x] Implement all CRUD operations
+  - [x] Add proper error handling and validation
 
-10. [x] Create `BeerOrderShipmentServiceImpl` class in `guru.springframework.juniemvc.services` package
-    - [x] Implement `BeerOrderShipmentService` interface
-    - [x] Add constructor injection for dependencies
-    - [x] Implement service methods with proper transaction boundaries
-    - [x] Add validation and error handling
-    - [x] Add appropriate logging
+## 7. Create Controller
+- [x] 7.1. Create BeerOrderShipmentController
+  - [x] Create a new controller `BeerOrderShipmentController` in the `guru.springframework.juniemvc.controllers` package
+  - [x] Use the path "/api/v1/beer-orders/{beerOrderId}/shipments" as specified in requirements
+  - [x] Implement CRUD endpoints (GET, POST, PUT, DELETE)
+  - [x] Use proper HTTP status codes and response entities
+  - [x] Add validation for request bodies
 
-## 7. Controller Implementation
-11. [x] Create `BeerOrderShipmentController` class in `guru.springframework.juniemvc.controllers` package
-    - [x] Add @RestController and @RequestMapping annotations
-    - [x] Add constructor injection for BeerOrderShipmentService
-    - [x] Implement GET mapping for retrieving all shipments
-    - [x] Implement GET mapping with ID for retrieving a specific shipment
-    - [x] Implement POST mapping for creating a shipment
-    - [x] Implement PUT mapping with ID for updating a shipment
-    - [x] Implement DELETE mapping with ID for deleting a shipment
-    - [x] Return appropriate HTTP status codes
-    - [x] Use ResponseEntity for responses
+## 8. Create Tests
+- [x] 8.1. Create Entity Tests
+  - [x] Create tests for the BeerOrderShipment entity
+  - [x] Test the relationship with BeerOrder
 
-## 8. OpenAPI Documentation
-12. [x] Update OpenAPI documentation
-    - [x] Add schema for BeerOrderShipment
-    - [x] Document API paths and operations
+- [x] 8.2. Create Repository Tests
+  - [x] Create tests for the BeerOrderShipmentRepository
+  - [x] Test finding shipments by beer order id
 
-## 9. Testing
-13. [x] Create Repository Tests
-    - [x] Create `BeerOrderShipmentRepositoryTest` class
-    - [x] Test basic CRUD operations
-    - [x] Test any custom query methods
+- [x] 8.3. Create Mapper Tests
+  - [x] Create tests for the BeerOrderShipmentMapper
+  - [x] Test mapping between entity and DTO in both directions
 
-14. [x] Create Mapper Tests
-    - [x] Create `BeerOrderShipmentMapperTest` class
-    - [x] Test entity-to-DTO and DTO-to-entity conversion
-    - [x] Test update method
+- [x] 8.4. Create Service Tests
+  - [x] Create tests for the BeerOrderShipmentServiceImpl
+  - [x] Test all CRUD operations
+  - [x] Test error handling and validation
 
-15. [x] Create Service Tests
-    - [x] Create `BeerOrderShipmentServiceImplTest` class
-    - [x] Test all service methods
-    - [x] Mock dependencies
+- [x] 8.5. Create Controller Tests
+  - [x] Create tests for the BeerOrderShipmentController
+  - [x] Test all endpoints
+  - [x] Test validation and error handling
 
-16. [x] Create Controller Tests
-    - [x] Create `BeerOrderShipmentControllerTest` class
-    - [x] Test all controller endpoints
-    - [x] Use MockMvc for testing
-    - [x] Mock service layer
+## 9. Update OpenAPI Documentation
+- [x] 9.1. Update OpenAPI Specification
+  - [x] Create a new path file for the BeerOrderShipment endpoints in the OpenAPI documentation
+  - [x] Add schema definitions for BeerOrderShipmentDto
+  - [x] Update the existing BeerOrder schema to include the shipments collection
+  - [x] Add proper descriptions, examples, and response definitions
 
-17. [x] Create Integration Tests
-    - [x] Create integration tests for complete flow
-    - [x] Test API endpoints with real data
-    - [x] Use @SpringBootTest with a random port
+## 10. Verify Implementation
+- [x] 10.1. Run All Tests
+  - [x] Run all tests to ensure everything is working correctly
+  - [x] Fix any issues that arise
 
-## 10. Verification
-18. [x] Run all tests to ensure they pass
-19. [x] Manually test the API endpoints
-20. [x] Verify all requirements are met
-21. [x] Ensure code follows Spring Boot Guidelines
+- [x] 10.2. Manual Testing
+  - [x] Manually test the API endpoints using a tool like Postman or curl
+  - [x] Verify that all CRUD operations work as expected
+  - [x] Verify that the relationship between BeerOrder and BeerOrderShipment is maintained correctly

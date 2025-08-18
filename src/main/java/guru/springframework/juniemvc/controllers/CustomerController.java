@@ -3,11 +3,13 @@ package guru.springframework.juniemvc.controllers;
 import guru.springframework.juniemvc.models.CustomerDto;
 import guru.springframework.juniemvc.services.CustomerService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,12 +26,20 @@ public class CustomerController {
     }
 
     /**
-     * Get all customers
-     * @return List of all customers
+     * Get all customers with pagination and optional filtering
+     * @param pageNumber the page number (0-based)
+     * @param pageSize the number of items per page
+     * @param name optional filter by customer name
+     * @return Page of customers
      */
     @GetMapping
-    public List<CustomerDto> getAllCustomers() {
-        return customerService.getAllCustomers();
+    public Page<CustomerDto> getAllCustomers(
+            @RequestParam(defaultValue = "0") Integer pageNumber,
+            @RequestParam(defaultValue = "25") Integer pageSize,
+            @RequestParam(required = false) String name) {
+        
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return customerService.getAllCustomers(pageable, name);
     }
 
     /**

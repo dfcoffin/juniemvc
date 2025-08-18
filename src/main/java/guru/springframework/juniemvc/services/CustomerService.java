@@ -1,6 +1,8 @@
 package guru.springframework.juniemvc.services;
 
 import guru.springframework.juniemvc.models.CustomerDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,14 @@ public interface CustomerService {
      * @return List of all customers
      */
     List<CustomerDto> getAllCustomers();
+    
+    /**
+     * Get customers with pagination and optional filtering
+     * @param pageable pagination information
+     * @param name optional name filter
+     * @return Page of customers
+     */
+    Page<CustomerDto> getAllCustomers(Pageable pageable, String name);
 
     /**
      * Get a customer by its ID

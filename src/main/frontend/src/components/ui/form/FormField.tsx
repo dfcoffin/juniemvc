@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import React, {ReactNode} from "react";
 
 interface FormFieldProps {
   id: string;
@@ -29,12 +29,8 @@ const FormField: React.FC<FormFieldProps> = ({
         </label>
       </div>
       {children}
-      {description && (
-        <p className="text-sm text-slate-500">{description}</p>
-      )}
-      {error && (
-        <p className="text-sm font-medium text-red-500">{error}</p>
-      )}
+      {description && <p className="text-sm text-slate-500">{description}</p>}
+      {error && <p className="text-sm font-medium text-red-500">{error}</p>}
     </div>
   );
 };

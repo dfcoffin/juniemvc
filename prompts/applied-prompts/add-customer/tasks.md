@@ -1,103 +1,84 @@
 # Customer Entity Implementation Tasks
 
-This document contains a detailed task list for implementing the Customer entity and related components according to the plan in `plan.md`.
-
 ## 1. Create Customer Entity
-- [x] 1.1. Create a new JPA entity class called `Customer` in the package `guru.springframework.juniemvc.entities`
-- [x] 1.2. Extend the `BaseEntity` class to inherit common fields
-- [x] 1.3. Add required properties with appropriate annotations:
-  - [x] 1.3.1. name (String, not null)
-  - [x] 1.3.2. email (String)
-  - [x] 1.3.3. phoneNumber (String)
-  - [x] 1.3.4. addressLine1 (String, not null)
-  - [x] 1.3.5. addressLine2 (String)
-  - [x] 1.3.6. city (String, not null)
-  - [x] 1.3.7. state (String, not null)
-  - [x] 1.3.8. zipCode (String, not null)
-- [x] 1.4. Add one-to-many relationship with BeerOrder
-- [x] 1.5. Add helper methods to manage the bidirectional relationship:
-  - [x] 1.5.1. addBeerOrder method
-  - [x] 1.5.2. removeBeerOrder method
+- [x] 1.1. Create a new Customer JPA entity that extends BaseEntity
+- [x] 1.2. Implement the following properties:
+  - [x] 1.2.1. name (String, not null)
+  - [x] 1.2.2. email (String)
+  - [x] 1.2.3. phoneNumber (String)
+  - [x] 1.2.4. addressLine1 (String, not null)
+  - [x] 1.2.5. addressLine2 (String)
+  - [x] 1.2.6. city (String, not null)
+  - [x] 1.2.7. state (String, not null)
+  - [x] 1.2.8. postalCode (String, not null)
+- [x] 1.3. Establish a OneToMany relationship with BeerOrder
 
 ## 2. Update BeerOrder Entity
-- [x] 2.1. Add many-to-one relationship with Customer
-- [x] 2.2. Update existing code to use Customer entity instead of customerRef field
+- [x] 2.1. Add a ManyToOne relationship to Customer
+- [x] 2.2. Update the BeerOrder entity to reference Customer instead of using customerRef
 
 ## 3. Create Flyway Migration Script
-- [x] 3.1. Create a new migration script in `src/main/resources/db/migration` named `V2__add_customer_table.sql`
-- [x] 3.2. Add SQL to create the customer table with all required fields
-- [x] 3.3. Add SQL to modify the beer_order table to add a customer_id column and foreign key constraint
-- [x] 3.4. Add SQL to migrate existing data (if any) from customer_ref to the new relationship
+- [x] 3.1. Create a new migration script (V2__add_customer_table.sql) to:
+  - [x] 3.1.1. Create the customer table with all required fields
+  - [x] 3.1.2. Alter the beer_order table to add a foreign key reference to the customer table
 
-## 4. Create Customer DTO
-- [x] 4.1. Create a new DTO class called `CustomerDto` in the package `guru.springframework.juniemvc.models`
-- [x] 4.2. Include all the same fields as the Customer entity
-- [x] 4.3. Add appropriate validation annotations:
-  - [x] 4.3.1. @NotBlank for required fields (name, addressLine1, city, state, zipCode)
-  - [x] 4.3.2. @Email for the email field
-- [x] 4.4. Use Lombok annotations to reduce boilerplate
+## 4. Create DTO and Mapper
+- [x] 4.1. Create CustomerDto class extending BaseEntityDto
+- [x] 4.2. Create CustomerMapper interface using MapStruct
+- [x] 4.3. Implement bidirectional mapping between Customer entity and CustomerDto
 
-## 5. Update BeerOrderDto
-- [x] 5.1. Add a reference to CustomerDto in the BeerOrderDto class
-- [x] 5.2. Update any related code that uses the customerRef field
+## 5. Create Repository
+- [x] 5.1. Create CustomerRepository interface extending JpaRepository
+- [x] 5.2. Add any necessary custom query methods
 
-## 6. Create Customer Mapper
-- [x] 6.1. Create a new mapper interface called `CustomerMapper` in the package `guru.springframework.juniemvc.mappers`
-- [x] 6.2. Use MapStruct to generate the implementation
-- [x] 6.3. Add methods to convert between Customer entity and CustomerDto
+## 6. Create Service Layer
+- [x] 6.1. Create CustomerService interface
+- [x] 6.2. Create CustomerServiceImpl class implementing CustomerService
+- [x] 6.3. Implement CRUD operations:
+  - [x] 6.3.1. getAllCustomers
+  - [x] 6.3.2. getCustomerById
+  - [x] 6.3.3. saveCustomer
+  - [x] 6.3.4. updateCustomer
+  - [x] 6.3.5. deleteCustomer
 
-## 7. Update BeerOrderMapper
-- [x] 7.1. Update the BeerOrderMapper to handle the new Customer relationship
-- [x] 7.2. Ensure proper mapping between Customer/CustomerDto in the conversion methods
+## 7. Create Controller
+- [x] 7.1. Create CustomerController class
+- [x] 7.2. Implement RESTful endpoints:
+  - [x] 7.2.1. GET /api/v1/customers - Get all customers
+  - [x] 7.2.2. GET /api/v1/customers/{id} - Get customer by ID
+  - [x] 7.2.3. POST /api/v1/customers - Create new customer
+  - [x] 7.2.4. PUT /api/v1/customers/{id} - Update existing customer
+  - [x] 7.2.5. DELETE /api/v1/customers/{id} - Delete customer
 
-## 8. Create Customer Repository
-- [x] 8.1. Create a new repository interface called `CustomerRepository` in the package `guru.springframework.juniemvc.repositories`
-- [x] 8.2. Extend JpaRepository for basic CRUD operations
-- [x] 8.3. Add any custom query methods if needed
+## 8. Update OpenAPI Documentation
+- [x] 8.1. Add Customer tag to openapi.yaml
+- [x] 8.2. Create path files for Customer operations:
+  - [x] 8.2.1. customers.yaml (GET all, POST)
+  - [x] 8.2.2. customers_{id}.yaml (GET by ID, PUT, DELETE)
+- [x] 8.3. Create schema file for CustomerDto
 
-## 9. Create Customer Service
-- [x] 9.1. Create a service interface called `CustomerService` in the package `guru.springframework.juniemvc.services`
-- [x] 9.2. Define methods for CRUD operations using CustomerDto:
-  - [x] 9.2.1. getAllCustomers method
-  - [x] 9.2.2. getCustomerById method
-  - [x] 9.2.3. saveCustomer method
-  - [x] 9.2.4. updateCustomerById method
-  - [x] 9.2.5. deleteCustomerById method
+## 9. Write Tests
+- [x] 9.1. Write unit tests for:
+  - [x] 9.1.1. CustomerMapper
+  - [x] 9.1.2. CustomerService
+  - [x] 9.1.3. CustomerController
+- [x] 9.2. Write integration tests for:
+  - [x] 9.2.1. CustomerRepository
+  - [x] 9.2.2. CustomerController (with MockMvc)
 
-## 10. Create Customer Service Implementation
-- [x] 10.1. Create a service implementation called `CustomerServiceImpl` in the package `guru.springframework.juniemvc.services`
-- [x] 10.2. Implement all methods defined in the CustomerService interface
-- [x] 10.3. Use the CustomerRepository and CustomerMapper for database operations and DTO conversions
-- [x] 10.4. Add appropriate transaction annotations (@Transactional)
+## 10. Verify Implementation
+- [x] 10.1. Run all tests to ensure they pass
+- [x] 10.2. Verify that the application builds successfully
+- [x] 10.3. Test the API endpoints manually using a tool like Postman or curl
 
-## 11. Create Customer Controller
-- [x] 11.1. Create a REST controller called `CustomerController` in the package `guru.springframework.juniemvc.controllers`
-- [x] 11.2. Implement endpoints for CRUD operations:
-  - [x] 11.2.1. GET /api/v1/customers - Get all customers
-  - [x] 11.2.2. GET /api/v1/customers/{id} - Get customer by ID
-  - [x] 11.2.3. POST /api/v1/customers - Create a new customer
-  - [x] 11.2.4. PUT /api/v1/customers/{id} - Update an existing customer
-  - [x] 11.2.5. DELETE /api/v1/customers/{id} - Delete a customer
-- [x] 11.3. Add appropriate validation and error handling
-
-## 12. Update OpenAPI Documentation
-- [x] 12.1. Create a new schema definition for CustomerDto in `openapi/openapi/components/schemas/CustomerDto.yaml`
-- [x] 12.2. Add path definitions for the new Customer endpoints:
-  - [x] 12.2.1. `openapi/openapi/paths/customers.yaml` - For collection operations (GET all, POST)
-  - [x] 12.2.2. `openapi/openapi/paths/customers_{id}.yaml` - For instance operations (GET by ID, PUT, DELETE)
-- [x] 12.3. Update any existing schemas or paths that reference the customer (e.g., BeerOrderDto)
-
-## 13. Write Tests
-- [x] 13.1. Write unit tests for all new components:
-  - [x] 13.1.1. CustomerMapperTest - Test entity-DTO conversions
-  - [x] 13.1.2. CustomerServiceImplTest - Test service methods with mocked repository
-  - [x] 13.1.3. CustomerControllerTest - Test REST endpoints with MockMvc
-- [x] 13.2. Write integration tests:
-  - [x] 13.2.1. CustomerRepositoryTest - Test database operations
-  - [x] 13.2.2. CustomerControllerIT - Test end-to-end API functionality
-
-## 14. Verify and Refine
-- [x] 14.1. Run all tests to ensure everything works correctly
-- [x] 14.2. Check for any edge cases or potential issues
-- [x] 14.3. Refine the implementation as needed
-- [x] 14.4. Ensure all requirements are met
+## Implementation Guidelines
+- [x] 11.1. Use constructor injection for dependencies, making fields final
+- [x] 11.2. Use package-private visibility for components when possible
+- [x] 11.3. Group configuration properties with a common prefix
+- [x] 11.4. Define service methods as transactional units
+- [x] 11.5. Set spring.jpa.open-in-view=false
+- [x] 11.6. Don't expose entities directly in controllers
+- [x] 11.7. Follow REST principles for endpoint design
+- [x] 11.8. Use purpose-built command objects for business operations
+- [x] 11.9. Implement global exception handling
+- [x] 11.10. Use SLF4J for logging, not System.out.println()

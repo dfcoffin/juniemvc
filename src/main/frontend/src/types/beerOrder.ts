@@ -36,11 +36,11 @@ export interface BeerOrderShipmentDto {
  * Beer Order status enum
  */
 export enum BeerOrderStatus {
-  NEW = 'NEW',
-  PAID = 'PAID',
-  CANCELLED = 'CANCELLED',
-  INPROCESS = 'INPROCESS',
-  COMPLETE = 'COMPLETE'
+  NEW = "NEW",
+  PAID = "PAID",
+  CANCELLED = "CANCELLED",
+  INPROCESS = "INPROCESS",
+  COMPLETE = "COMPLETE",
 }
 
 /**

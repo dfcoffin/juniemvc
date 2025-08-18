@@ -1,5 +1,5 @@
-import {apiService} from '../api/axiosConfig';
-import {Customer, CustomerDto, CustomerPage, CustomerPatchDto} from '../types/customer';
+import {apiService} from "../api/axiosConfig";
+import type {Customer, CustomerDto, CustomerPage, CustomerPatchDto,} from "@/types/customer";
 
 /**
  * Customer service for handling customer-related API operations
@@ -15,16 +15,32 @@ export const CustomerService = {
   getCustomers: (
     pageNumber: number = 0,
     pageSize: number = 25,
-    name?: string
+    name?: string,
   ): Promise<CustomerPage> => {
-    const params: Record<string, any> = {
+    const params: Record<string, number | string | undefined> = {
       pageNumber,
       pageSize,
     };
 
     if (name) params.name = name;
 
-    return apiService.get<CustomerPage>('/api/v1/customers', { params });
+    return apiService
+      .get<CustomerPage>("/api/v1/customers", { params })
+      .then((response) => {
+        // Handle response and make sure both name and customerName properties are set
+        if (response && response.content && Array.isArray(response.content)) {
+          response.content = response.content.map((customer) => {
+            // Ensure both name and customerName are set correctly
+            if (customer.customerName && !customer.name) {
+              customer.name = customer.customerName;
+            } else if (customer.name && !customer.customerName) {
+              customer.customerName = customer.name;
+            }
+            return customer;
+          });
+        }
+        return response;
+      });
   },
 
   /**
@@ -33,7 +49,17 @@ export const CustomerService = {
    * @returns Promise with customer data
    */
   getCustomerById: (id: number): Promise<Customer> => {
-    return apiService.get<Customer>(`/api/v1/customers/${id}`);
+    return apiService
+      .get<Customer>(`/api/v1/customers/${id}`)
+      .then((customer) => {
+        // Ensure both name and customerName are set correctly
+        if (customer.customerName && !customer.name) {
+          customer.name = customer.customerName;
+        } else if (customer.name && !customer.customerName) {
+          customer.customerName = customer.name;
+        }
+        return customer;
+      });
   },
 
   /**
@@ -42,7 +68,23 @@ export const CustomerService = {
    * @returns Promise with the created customer
    */
   createCustomer: (customerDto: CustomerDto): Promise<Customer> => {
-    return apiService.post<Customer>('/api/v1/customers', customerDto);
+    // Ensure both name properties are consistent in the DTO
+    const dto = { ...customerDto };
+    if (dto.name) {
+      dto.customerName = dto.name;
+    }
+
+    return apiService
+      .post<Customer>("/api/v1/customers", dto)
+      .then((customer) => {
+        // Ensure both name and customerName are set correctly in the response
+        if (customer.customerName && !customer.name) {
+          customer.name = customer.customerName;
+        } else if (customer.name && !customer.customerName) {
+          customer.customerName = customer.name;
+        }
+        return customer;
+      });
   },
 
   /**
@@ -52,7 +94,23 @@ export const CustomerService = {
    * @returns Promise with the updated customer
    */
   updateCustomer: (id: number, customerDto: CustomerDto): Promise<Customer> => {
-    return apiService.put<Customer>(`/api/v1/customers/${id}`, customerDto);
+    // Ensure both name properties are consistent in the DTO
+    const dto = { ...customerDto };
+    if (dto.name) {
+      dto.customerName = dto.name;
+    }
+
+    return apiService
+      .put<Customer>(`/api/v1/customers/${id}`, dto)
+      .then((customer) => {
+        // Ensure both name and customerName are set correctly in the response
+        if (customer.customerName && !customer.name) {
+          customer.name = customer.customerName;
+        } else if (customer.name && !customer.customerName) {
+          customer.customerName = customer.name;
+        }
+        return customer;
+      });
   },
 
   /**
@@ -61,8 +119,29 @@ export const CustomerService = {
    * @param customerPatchDto - The partial customer data to update
    * @returns Promise with the updated customer
    */
-  patchCustomer: (id: number, customerPatchDto: CustomerPatchDto): Promise<Customer> => {
-    return apiService.patch<Customer>(`/api/v1/customers/${id}`, customerPatchDto);
+  patchCustomer: (
+    id: number,
+    customerPatchDto: CustomerPatchDto,
+  ): Promise<Customer> => {
+    // Ensure both name properties are consistent in the DTO
+    const dto = { ...customerPatchDto };
+    if (dto.name && !dto.customerName) {
+      dto.customerName = dto.name;
+    } else if (dto.customerName && !dto.name) {
+      dto.name = dto.customerName;
+    }
+
+    return apiService
+      .patch<Customer>(`/api/v1/customers/${id}`, dto)
+      .then((customer) => {
+        // Ensure both name and customerName are set correctly in the response
+        if (customer.customerName && !customer.name) {
+          customer.name = customer.customerName;
+        } else if (customer.name && !customer.customerName) {
+          customer.customerName = customer.name;
+        }
+        return customer;
+      });
   },
 
   /**
@@ -80,8 +159,8 @@ export const CustomerService = {
    * @returns Promise with the customer's beer orders
    */
   getCustomerBeerOrders: (id: number): Promise<Customer> => {
-    return apiService.get<Customer>(`/api/v1/customers/${id}/orders`);
-  }
+    return apiService.get<Customer>(`/api/v1/customers/${id}/beer-orders`);
+  },
 };
 
 export default CustomerService;

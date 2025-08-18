@@ -1,5 +1,6 @@
-import {apiService} from '../api/axiosConfig';
-import {Beer, BeerDto, BeerPage, BeerPatchDto, BeerStyle} from '../types/beer';
+import {apiService} from "@/api/axiosConfig";
+import type {Beer, BeerDto, BeerPage, BeerPatchDto} from "@/types/beer";
+import {BeerStyle} from "@/types/beer";
 
 /**
  * Beer service for handling beer-related API operations
@@ -13,11 +14,11 @@ export const BeerService = {
    */
   uploadBeerImage: (id: string, file: File): Promise<Beer> => {
     const formData = new FormData();
-    formData.append('file', file);
-    
-    return apiService.post<Beer>(`/api/v1/beer/${id}/image`, formData, {
+    formData.append("file", file);
+
+    return apiService.post<Beer>(`/api/v1/beers/${id}/image`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
   },
@@ -35,9 +36,9 @@ export const BeerService = {
     pageSize: number = 25,
     beerName?: string,
     beerStyle?: BeerStyle,
-    showInventory: boolean = false
+    showInventory: boolean = false,
   ): Promise<BeerPage> => {
-    const params: Record<string, any> = {
+    const params: Record<string, number | string | boolean | undefined> = {
       pageNumber,
       pageSize,
       showInventory,
@@ -46,7 +47,7 @@ export const BeerService = {
     if (beerName) params.beerName = beerName;
     if (beerStyle) params.beerStyle = beerStyle;
 
-    return apiService.get<BeerPage>('/api/v1/beer', { params });
+    return apiService.get<BeerPage>("/api/v1/beers", { params });
   },
 
   /**
@@ -55,7 +56,7 @@ export const BeerService = {
    * @returns Promise with beer data
    */
   getBeerById: (id: string): Promise<Beer> => {
-    return apiService.get<Beer>(`/api/v1/beer/${id}`);
+    return apiService.get<Beer>(`/api/v1/beers/${id}`);
   },
 
   /**
@@ -64,7 +65,7 @@ export const BeerService = {
    * @returns Promise with the created beer
    */
   createBeer: (beerDto: BeerDto): Promise<Beer> => {
-    return apiService.post<Beer>('/api/v1/beer', beerDto);
+    return apiService.post<Beer>("/api/v1/beers", beerDto);
   },
 
   /**
@@ -74,7 +75,7 @@ export const BeerService = {
    * @returns Promise with the updated beer
    */
   updateBeer: (id: string, beerDto: BeerDto): Promise<Beer> => {
-    return apiService.put<Beer>(`/api/v1/beer/${id}`, beerDto);
+    return apiService.put<Beer>(`/api/v1/beers/${id}`, beerDto);
   },
 
   /**
@@ -84,7 +85,7 @@ export const BeerService = {
    * @returns Promise with the updated beer
    */
   patchBeer: (id: string, beerPatchDto: BeerPatchDto): Promise<Beer> => {
-    return apiService.patch<Beer>(`/api/v1/beer/${id}`, beerPatchDto);
+    return apiService.patch<Beer>(`/api/v1/beers/${id}`, beerPatchDto);
   },
 
   /**
@@ -93,7 +94,7 @@ export const BeerService = {
    * @returns Promise with void
    */
   deleteBeer: (id: string): Promise<void> => {
-    return apiService.delete<void>(`/api/v1/beer/${id}`);
+    return apiService.delete<void>(`/api/v1/beers/${id}`);
   },
 };
 

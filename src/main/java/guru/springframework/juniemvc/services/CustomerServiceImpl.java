@@ -5,8 +5,11 @@ import guru.springframework.juniemvc.exceptions.NotFoundException;
 import guru.springframework.juniemvc.mappers.CustomerMapper;
 import guru.springframework.juniemvc.models.CustomerDto;
 import guru.springframework.juniemvc.repositories.CustomerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +35,20 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findAll().stream()
                 .map(customerMapper::customerToCustomerDto)
                 .collect(Collectors.toList());
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CustomerDto> getAllCustomers(Pageable pageable, String name) {
+        Page<Customer> customerPage;
+        
+        if (StringUtils.hasText(name)) {
+            customerPage = customerRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else {
+            customerPage = customerRepository.findAll(pageable);
+        }
+        
+        return customerPage.map(customerMapper::customerToCustomerDto);
     }
 
     @Override

@@ -1,7 +1,7 @@
-import React, {useEffect, useRef} from 'react';
-import {createPortal} from 'react-dom';
-import {cn} from '../../../utils/cn';
-import {X} from 'lucide-react';
+import React, {useEffect, useRef} from "react";
+import {createPortal} from "react-dom";
+import {cn} from "../../../utils/cn";
+import {X} from "lucide-react";
 
 interface DialogProps {
   isOpen: boolean;
@@ -9,7 +9,7 @@ interface DialogProps {
   children: React.ReactNode;
   title?: string;
   description?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: "sm" | "md" | "lg" | "xl" | "full";
   className?: string;
   showCloseButton?: boolean;
   closeOnEsc?: boolean;
@@ -22,60 +22,60 @@ const Dialog: React.FC<DialogProps> = ({
   children,
   title,
   description,
-  size = 'md',
+  size = "md",
   className,
   showCloseButton = true,
   closeOnEsc = true,
   closeOnOutsideClick = true,
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (closeOnEsc && e.key === 'Escape') {
+      if (closeOnEsc && e.key === "Escape") {
         onClose();
       }
     };
-    
-    document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
-    
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
     };
   }, [isOpen, onClose, closeOnEsc]);
-  
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (!closeOnOutsideClick) return;
     if (dialogRef.current && !dialogRef.current.contains(e.target as Node)) {
       onClose();
     }
   };
-  
+
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    full: 'max-w-full mx-4',
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
+    full: "max-w-full mx-4",
   };
-  
+
   if (!isOpen) return null;
-  
+
   return createPortal(
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
       onClick={handleBackdropClick}
     >
-      <div 
+      <div
         ref={dialogRef}
         className={cn(
-          'bg-white rounded-lg shadow-lg w-full p-4 md:p-6 animate-in fade-in-0 zoom-in-95',
+          "bg-white rounded-lg shadow-lg w-full p-4 md:p-6 animate-in fade-in-0 zoom-in-95",
           sizeClasses[size],
-          className
+          className,
         )}
       >
         {(title || showCloseButton) && (
@@ -88,7 +88,7 @@ const Dialog: React.FC<DialogProps> = ({
                 )}
               </div>
             )}
-            
+
             {showCloseButton && (
               <button
                 type="button"
@@ -101,13 +101,11 @@ const Dialog: React.FC<DialogProps> = ({
             )}
           </div>
         )}
-        
-        <div className="max-h-[calc(100vh-7rem)] overflow-auto">
-          {children}
-        </div>
+
+        <div className="max-h-[calc(100vh-7rem)] overflow-auto">{children}</div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

@@ -1,4 +1,4 @@
-import React, {FormEvent, ReactNode, useState} from 'react';
+import React, {FormEvent, ReactNode, useState} from "react";
 
 interface FormHandlerProps<T> {
   initialData?: T;
@@ -12,11 +12,11 @@ interface FormHandlerProps<T> {
     errors: Record<string, string>;
     setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
     handleSubmit: (e: FormEvent) => Promise<void>;
-    updateField: (field: keyof T, value: any) => void;
+    updateField: (field: keyof T, value: unknown) => void;
   }) => ReactNode;
 }
 
-const FormHandler = <T extends Record<string, any>>({
+const FormHandler = <T extends Record<string, unknown>>({
   initialData = {} as T,
   onSubmit,
   onSuccess,
@@ -27,9 +27,9 @@ const FormHandler = <T extends Record<string, any>>({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const updateField = (field: keyof T, value: any) => {
+  const updateField = (field: keyof T, value: unknown) => {
     setData((prev) => ({ ...prev, [field]: value }));
-    
+
     // Clear error for this field when it's updated
     if (errors[field as string]) {
       setErrors((prev) => {
@@ -42,15 +42,15 @@ const FormHandler = <T extends Record<string, any>>({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await onSubmit(data);
       onSuccess?.(data);
     } catch (error) {
-      console.error('Form submission error:', error);
-      
+      console.error("Form submission error:", error);
+
       // Handle API validation errors if they're in a standard format
       if (error instanceof Error) {
         try {
@@ -58,14 +58,18 @@ const FormHandler = <T extends Record<string, any>>({
           const errorResponse = JSON.parse(error.message);
           if (errorResponse.fieldErrors) {
             const fieldErrors: Record<string, string> = {};
-            for (const [field, messages] of Object.entries(errorResponse.fieldErrors)) {
-              fieldErrors[field] = Array.isArray(messages) ? messages[0] : messages as string;
+            for (const [field, messages] of Object.entries(
+              errorResponse.fieldErrors,
+            )) {
+              fieldErrors[field] = Array.isArray(messages)
+                ? messages[0]
+                : (messages as string);
             }
             setErrors(fieldErrors);
           } else {
             onError?.(error);
           }
-        } catch (parseError) {
+        } catch {
           // If error message isn't JSON, just pass the error to the handler
           onError?.(error);
         }

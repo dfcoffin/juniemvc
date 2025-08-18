@@ -1,5 +1,6 @@
-import axios, {AxiosError, AxiosInstance, AxiosRequestConfig} from 'axios';
-import {getEnvConfig} from '../utils/env';
+import type {AxiosInstance, AxiosRequestConfig} from "axios";
+import axios, {AxiosError} from "axios";
+import {getEnvConfig} from "../utils/env";
 
 // Get environment configuration
 const { apiBaseUrl } = getEnvConfig();
@@ -8,7 +9,7 @@ const { apiBaseUrl } = getEnvConfig();
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 15000, // 15 seconds
 });
@@ -25,7 +26,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor for API calls
@@ -38,36 +39,36 @@ axiosInstance.interceptors.response.use(
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.error('API Error Response:', error.response.data);
-      console.error('Status:', error.response.status);
+      console.error("API Error Response:", error.response.data);
+      console.error("Status:", error.response.status);
     } else if (error.request) {
       // The request was made but no response was received
-      console.error('API Error Request:', error.request);
+      console.error("API Error Request:", error.request);
     } else {
       // Something happened in setting up the request that triggered an Error
-      console.error('API Error Message:', error.message);
+      console.error("API Error Message:", error.message);
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // Helper functions for common operations
 export const apiService = {
-  get: <T>(url: string, config?: AxiosRequestConfig) => 
-    axiosInstance.get<T>(url, config).then(response => response.data),
-  
-  post: <T>(url: string, data?: any, config?: AxiosRequestConfig) => 
-    axiosInstance.post<T>(url, data, config).then(response => response.data),
-  
-  put: <T>(url: string, data?: any, config?: AxiosRequestConfig) => 
-    axiosInstance.put<T>(url, data, config).then(response => response.data),
-  
-  patch: <T>(url: string, data?: any, config?: AxiosRequestConfig) => 
-    axiosInstance.patch<T>(url, data, config).then(response => response.data),
-  
-  delete: <T>(url: string, config?: AxiosRequestConfig) => 
-    axiosInstance.delete<T>(url, config).then(response => response.data),
+  get: <T>(url: string, config?: AxiosRequestConfig) =>
+    axiosInstance.get<T>(url, config).then((response) => response.data),
+
+  post: <T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
+    axiosInstance.post<T>(url, data, config).then((response) => response.data),
+
+  put: <T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
+    axiosInstance.put<T>(url, data, config).then((response) => response.data),
+
+  patch: <T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
+    axiosInstance.patch<T>(url, data, config).then((response) => response.data),
+
+  delete: <T>(url: string, config?: AxiosRequestConfig) =>
+    axiosInstance.delete<T>(url, config).then((response) => response.data),
 };
 
 export default axiosInstance;

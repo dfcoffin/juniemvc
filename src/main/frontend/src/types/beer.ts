@@ -6,16 +6,16 @@
  * Beer style enumeration
  */
 export enum BeerStyle {
-  LAGER = 'LAGER',
-  PILSNER = 'PILSNER',
-  STOUT = 'STOUT',
-  GOSE = 'GOSE',
-  PORTER = 'PORTER',
-  ALE = 'ALE',
-  WHEAT = 'WHEAT',
-  IPA = 'IPA',
-  PALE_ALE = 'PALE_ALE',
-  SAISON = 'SAISON'
+  LAGER = "LAGER",
+  PILSNER = "PILSNER",
+  STOUT = "STOUT",
+  GOSE = "GOSE",
+  PORTER = "PORTER",
+  ALE = "ALE",
+  WHEAT = "WHEAT",
+  IPA = "IPA",
+  PALE_ALE = "PALE_ALE",
+  SAISON = "SAISON",
 }
 
 /**

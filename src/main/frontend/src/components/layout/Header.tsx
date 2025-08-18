@@ -1,6 +1,7 @@
-import React from 'react';
-import {Menu} from 'lucide-react';
-import {Link} from 'react-router-dom';
+import React from "react";
+import {Menu} from "lucide-react";
+import {Link} from "react-router-dom";
+import reactLogo from "../../assets/react.svg";
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -19,21 +20,30 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <span className="sr-only">Toggle sidebar</span>
           </button>
           <Link to="/" className="flex items-center gap-2">
-            <img 
-              src="/logo.svg" 
-              alt="Beer Service Logo" 
+            <img
+              src="/logo.svg"
+              alt="Beer Service Logo"
               className="h-8 w-8"
               onError={(e) => {
-                e.currentTarget.src = 'https://via.placeholder.com/32';
+                e.currentTarget.src = reactLogo;
               }}
             />
             <span className="text-xl font-bold">Beer Service</span>
           </Link>
         </div>
         <nav className="hidden md:flex gap-6">
-          <Link to="/beers" className="text-sm font-medium hover:text-primary">Beers</Link>
-          <Link to="/customers" className="text-sm font-medium hover:text-primary">Customers</Link>
-          <Link to="/orders" className="text-sm font-medium hover:text-primary">Orders</Link>
+          <Link to="/beers" className="text-sm font-medium hover:text-primary">
+            Beers
+          </Link>
+          <Link
+            to="/customers"
+            className="text-sm font-medium hover:text-primary"
+          >
+            Customers
+          </Link>
+          <Link to="/orders" className="text-sm font-medium hover:text-primary">
+            Orders
+          </Link>
         </nav>
         <div className="flex items-center gap-4">
           {/* Additional header elements like user profile, notifications, etc. */}

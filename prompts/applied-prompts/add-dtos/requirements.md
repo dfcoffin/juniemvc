@@ -1,13 +1,16 @@
-# Requirements: Implementing DTO Pattern for Beer API
+# Adding DTOs to the Beer API
 
 ## Overview
-This document outlines the requirements for implementing the Data Transfer Object (DTO) pattern in the Beer API. The goal is to separate the presentation layer from the persistence layer by introducing DTOs as intermediaries between the REST controllers and the JPA entities.
+This document outlines the requirements for implementing Data Transfer Objects (DTOs) in the Beer API application. The goal is to separate the web layer from the persistence layer by introducing DTOs, following Spring Boot best practices.
+
+## Background
+Currently, the application exposes JPA entities directly through the REST API, which tightly couples the API contract to the database schema. This makes it difficult to evolve the API and database independently. By introducing DTOs, we can decouple these layers and gain more flexibility.
 
 ## Requirements
 
-### 1. Create BeerDto Class
-- Create a new POJO class called `BeerDto` in the package `guru.springframework.juniemvc.models`
-- The DTO should have the same properties as the Beer entity:
+### 1. Create DTO Classes
+- Create a new package `guru.springframework.juniemvc.models` to contain all DTO classes
+- Create a `BeerDto` class with the following properties:
   - Integer id
   - Integer version
   - String beerName
@@ -15,80 +18,71 @@ This document outlines the requirements for implementing the Data Transfer Objec
   - String upc
   - Integer quantityOnHand
   - BigDecimal price
-  - LocalDateTime createDate
+  - LocalDateTime createdDate
   - LocalDateTime updateDate
-- Apply the following Lombok annotations to the DTO:
-  - `@Getter`
-  - `@Setter`
-  - `@Builder`
+- Use Lombok annotations to reduce boilerplate:
+  - `@Data` (or `@Getter` and `@Setter`)
   - `@NoArgsConstructor`
   - `@AllArgsConstructor`
-
-### 1.1 Apply Jakarta Validation Annotations
-- Add appropriate Jakarta Validation annotations to the BeerDto class to ensure data integrity:
-  - `beerName`:
-    - `@NotBlank` - Ensure the beer name is not null and contains at least one non-whitespace character
-    - `@Size(min = 3, max = 50)` - Ensure the beer name is between 3 and 50 characters
-  - `beerStyle`:
-    - `@NotBlank` - Ensure the beer style is not null and contains at least one non-whitespace character
-  - `upc`:
-    - `@NotBlank` - Ensure the UPC is not null and contains at least one non-whitespace character
-    - `@Size(min = 12, max = 13)` - Ensure the UPC is either 12 or 13 characters long
-  - `quantityOnHand`:
-    - `@NotNull` - Ensure the quantity is not null
-    - `@PositiveOrZero` - Ensure the quantity is zero or positive
-  - `price`:
-    - `@NotNull` - Ensure the price is not null
-    - `@Positive` - Ensure the price is a positive value
-    - `@Digits(integer = 6, fraction = 2)` - Ensure the price has at most 6 digits in the integer part and 2 in the decimal part
+  - `@Builder`
 
 ### 2. Create MapStruct Mapper
-- Create a new interface called `BeerMapper` in the package `guru.springframework.juniemvc.mappers`
-- Use the MapStruct `@Mapper` annotation with `componentModel = "spring"` to make it a Spring bean
-- Define the following mapping methods:
-  - `BeerDto beerToBeerDto(Beer beer)` - Convert from Beer entity to BeerDto
-  - `Beer beerDtoToBeer(BeerDto beerDto)` - Convert from BeerDto to Beer entity
-- When mapping from BeerDto to Beer entity, ignore the following properties:
-  - id
-  - createDate
-  - updateDate
+- Create a new package `guru.springframework.juniemvc.mappers` to contain all mapper interfaces
+- Create a `BeerMapper` interface using MapStruct:
+  ```java
+  @Mapper
+  public interface BeerMapper {
+      BeerDto beerToBeerDto(Beer beer);
+      
+      // When mapping from DTO to entity, ignore id, createdDate, and updateDate
+      // as these are managed by the persistence layer
+      @Mapping(target = "id", ignore = true)
+      @Mapping(target = "createdDate", ignore = true)
+      @Mapping(target = "updateDate", ignore = true)
+      Beer beerDtoToBeer(BeerDto beerDto);
+  }
+  ```
 
 ### 3. Update Service Layer
-- Modify the `BeerService` interface to:
-  - Accept BeerDto objects as parameters instead of Beer entities
-  - Return BeerDto objects instead of Beer entities
-- Update the `BeerServiceImpl` class to:
-  - Inject the BeerMapper
-  - Use the mapper to convert between DTOs and entities
-  - Maintain the same business logic but operate on DTOs at the service boundary
+- Modify the `BeerService` interface to use DTOs instead of entities:
+  ```java
+  public interface BeerService {
+      List<BeerDto> getAllBeers();
+      Optional<BeerDto> getBeerById(Integer id);
+      BeerDto saveBeer(BeerDto beerDto);
+      void deleteBeerById(Integer id);
+  }
+  ```
+- Update `BeerServiceImpl` to:
+  - Inject the `BeerMapper`
+  - Convert between entities and DTOs using the mapper
+  - Continue using the repository with entities
 
 ### 4. Update Controller Layer
-- Modify the `BeerController` class to:
-  - Use BeerDto objects in all method signatures instead of Beer entities
-  - No changes to the REST API endpoints or HTTP methods are required
-  - Ensure all controller methods use the updated service methods that work with DTOs
-  - Add `@Valid` annotation to method parameters that accept BeerDto objects to trigger validation
-  - Ensure proper error handling for validation failures
+- Modify `BeerController` to use DTOs instead of entities:
+  - Update method signatures to accept and return DTOs
+  - Remove any direct manipulation of entity-specific properties
+  - Maintain the same REST API contract (endpoints, HTTP methods, status codes)
+
+### 5. Validation
+- Add Jakarta Validation annotations to the `BeerDto` class:
+  - `@NotBlank` for String fields that shouldn't be empty
+  - `@NotNull` for required fields
+  - `@Positive` or `@PositiveOrZero` for numeric fields as appropriate
+- Update the controller to use `@Valid` annotation on request bodies
+
+### 6. Testing
+- Update existing tests to work with DTOs instead of entities
+- Ensure all tests pass with the new implementation
 
 ## Implementation Guidelines
-1. Maintain the existing REST API contract (URLs, HTTP methods, status codes)
-2. Ensure proper error handling is preserved
-3. Use constructor injection for all dependencies
-4. Follow the existing code style and documentation patterns
-5. The service layer should handle the conversion between DTOs and entities, not the controller
-6. Implement a global exception handler for validation errors that returns appropriate HTTP status codes and error messages
+- Follow the constructor injection pattern for all dependencies
+- Use package-private visibility where appropriate
+- Maintain clear transaction boundaries in the service layer
+- Ensure proper error handling
 
-### Validation Error Handling
-- Create a `ControllerAdvice` class to handle validation exceptions
-- Return HTTP 400 Bad Request status for validation errors
-- Include clear error messages that indicate which fields failed validation and why
-- Format the error response consistently with other error responses in the application
-
-## Testing
-- Update existing tests to work with the DTO pattern
-- Ensure all tests pass after the changes
-- Verify that the API continues to function as expected with the new DTO layer
-- Add validation tests:
-  - Test that valid DTOs pass validation
-  - Test that invalid DTOs fail validation with appropriate error messages
-  - Test the global exception handler for validation errors
+## Acceptance Criteria
+- All API endpoints continue to function as before, but now use DTOs instead of entities
+- The web layer is completely decoupled from the persistence layer
+- All tests pass
+- The application builds successfully

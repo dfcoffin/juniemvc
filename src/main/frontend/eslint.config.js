@@ -8,7 +8,7 @@ import eslintPluginPrettier from 'eslint-plugin-prettier'
 import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default tseslint.config([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'coverage/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -27,6 +27,8 @@ export default tseslint.config([
     },
     rules: {
       'prettier/prettier': 'error',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_', 'varsIgnorePattern': '^_' }],
     },
   },
 ])

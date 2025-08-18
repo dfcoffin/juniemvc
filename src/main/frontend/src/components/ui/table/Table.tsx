@@ -1,5 +1,5 @@
-import React, {HTMLAttributes, ReactNode} from 'react';
-import {cn} from '../../../utils/cn';
+import React, {HTMLAttributes, ReactNode} from "react";
+import {cn} from "../../../utils/cn";
 
 interface TableProps extends HTMLAttributes<HTMLTableElement> {
   children: ReactNode;
@@ -12,8 +12,8 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
         <table
           ref={ref}
           className={cn(
-            'w-full caption-bottom text-sm border-collapse',
-            className
+            "w-full caption-bottom text-sm border-collapse",
+            className,
           )}
           {...props}
         >
@@ -21,9 +21,9 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
         </table>
       </div>
     );
-  }
+  },
 );
 
-Table.displayName = 'Table';
+Table.displayName = "Table";
 
 export default Table;

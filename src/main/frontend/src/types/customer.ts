@@ -2,7 +2,7 @@
  * Customer types definitions
  */
 
-import {BeerOrderDto} from './beerOrder';
+import type {BeerOrderDto} from "./beerOrder";
 
 /**
  * Customer interface representing a customer entity
@@ -13,6 +13,7 @@ export interface Customer {
   createdDate?: string;
   updateDate?: string;
   name: string;
+  customerName: string; // Added for backward compatibility with existing code
   email?: string;
   phoneNumber?: string;
   addressLine1: string;
@@ -57,6 +58,7 @@ export interface CustomerPage {
  */
 export interface CustomerDto {
   name: string;
+  customerName?: string; // Added for backward compatibility
   email?: string;
   phoneNumber?: string;
   addressLine1: string;
@@ -71,6 +73,7 @@ export interface CustomerDto {
  */
 export interface CustomerPatchDto {
   name?: string;
+  customerName?: string; // Added for backward compatibility
   email?: string;
   phoneNumber?: string;
   addressLine1?: string;

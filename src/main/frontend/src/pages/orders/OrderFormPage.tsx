@@ -1,87 +1,113 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {BeerOrderDto, BeerOrderLineDto, BeerOrderStatus} from '../../types/beerOrder';
-import BeerOrderService from '../../services/beerOrderService';
-import BeerService from '../../services/beerService';
-import CustomerService from '../../services/customerService';
-import {Beer} from '../../types/beer';
-import {Customer} from '../../types/customer';
-import {PageContainer} from '../../components/layout/PageContainer';
-import {FormField, FormSubmitButton, Input, Select} from '../../components/ui/form';
-import {toast} from '../../components/ui/dialog';
-import {ArrowLeft, Plus, Trash2} from 'lucide-react';
-import {minLength, required} from '../../utils/validation';
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableHeaderRow, TableRow} from '../../components/ui/table';
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import type {Beer, BeerOrderDto, BeerOrderLineDto, BeerOrderShipmentDto, Customer,} from "../../types";
+import {BeerOrderStatus} from "../../types";
+import BeerOrderService from "../../services/beerOrderService";
+import BeerService from "../../services/beerService";
+import CustomerService from "../../services/customerService";
+import PageContainer from "../../components/layout/PageContainer";
+import {FormField, FormSubmitButton, Input, Select,} from "../../components/ui/form";
+import {toast} from "../../components/ui/dialog";
+import {ArrowLeft, Plus, Trash2} from "lucide-react";
+import {minLength, required} from "../../utils/validation";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableHeaderRow,
+    TableRow,
+} from "../../components/ui/table";
 
 const OrderFormPage = () => {
   const navigate = useNavigate();
-  
+
   // Form state
   const [order, setOrder] = useState<Partial<BeerOrderDto>>({
-    customerRef: '',
+    customerRef: "",
     paymentAmount: 0,
     status: BeerOrderStatus.NEW,
-    beerOrderLines: []
+    beerOrderLines: [],
   });
-  
+
   // Form validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   // Loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Customer selection
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  const [selectedCustomer, setSelectedCustomer] = useState<string>("");
   const [customersLoading, setCustomersLoading] = useState(true);
-  
+
   // Beer selection for line items
   const [beers, setBeers] = useState<Beer[]>([]);
   const [beersLoading, setBeersLoading] = useState(true);
-  
+
   // New line item
   const [newLineItem, setNewLineItem] = useState<Partial<BeerOrderLineDto>>({
     beerId: undefined,
-    orderQuantity: 1
+    orderQuantity: 1,
   });
 
   // Load customers and beers
   useEffect(() => {
     const loadCustomers = async () => {
       try {
+        setCustomersLoading(true);
+        // Use cache=false to force a fresh API call each time
         const response = await CustomerService.getCustomers(0, 100);
-        setCustomers(response.content);
+
+        if (response && response.content && Array.isArray(response.content)) {
+          setCustomers(response.content);
+        } else {
+          console.error("Invalid customer response format:", response);
+          setCustomers([]);
+        }
       } catch (err) {
-        console.error('Error loading customers:', err);
-        toast.error('Failed to load customers');
+        console.error("Error loading customers:", err);
+        toast.error("Failed to load customers");
+        setCustomers([]);
       } finally {
         setCustomersLoading(false);
       }
     };
-    
+
     const loadBeers = async () => {
       try {
+        setBeersLoading(true);
         const response = await BeerService.getBeers(0, 100);
         setBeers(response.content);
       } catch (err) {
-        console.error('Error loading beers:', err);
-        toast.error('Failed to load beers');
+        console.error("Error loading beers:", err);
+        toast.error("Failed to load beers");
       } finally {
         setBeersLoading(false);
       }
     };
-    
+
     loadCustomers();
     loadBeers();
   }, []);
 
   // Handle field change
-  const handleFieldChange = (field: keyof BeerOrderDto, value: any) => {
+  const handleFieldChange = (
+    field: keyof BeerOrderDto,
+    value:
+      | string
+      | number
+      | BeerOrderStatus
+      | BeerOrderLineDto[]
+      | BeerOrderShipmentDto[]
+      | undefined,
+  ) => {
     setOrder({
       ...order,
       [field]: value,
     });
-    
+
     // Clear error when field is updated
     if (errors[field]) {
       const newErrors = { ...errors };
@@ -93,19 +119,22 @@ const OrderFormPage = () => {
   // Handle customer selection
   const handleCustomerChange = (customerId: string) => {
     setSelectedCustomer(customerId);
-    
+
     if (customerId) {
-      const selected = customers.find(c => c.id === parseInt(customerId, 10));
+      const selected = customers.find((c) => c.id === parseInt(customerId, 10));
       if (selected) {
-        handleFieldChange('customerRef', selected.customerName);
+        handleFieldChange("customerRef", selected.customerName);
       }
     } else {
-      handleFieldChange('customerRef', '');
+      handleFieldChange("customerRef", "");
     }
   };
 
   // Handle new line item field change
-  const handleLineItemChange = (field: keyof BeerOrderLineDto, value: any) => {
+  const handleLineItemChange = (
+    field: keyof BeerOrderLineDto,
+    value: string | number | undefined,
+  ) => {
     setNewLineItem({
       ...newLineItem,
       [field]: value,
@@ -115,17 +144,17 @@ const OrderFormPage = () => {
   // Add line item to order
   const handleAddLineItem = () => {
     if (!newLineItem.beerId || !newLineItem.orderQuantity) {
-      toast.error('Please select a beer and quantity');
+      toast.error("Please select a beer and quantity");
       return;
     }
-    
+
     // Find beer details
-    const selectedBeer = beers.find(b => b.id === newLineItem.beerId);
+    const selectedBeer = beers.find((b) => b.id === newLineItem.beerId);
     if (!selectedBeer) {
-      toast.error('Selected beer not found');
+      toast.error("Selected beer not found");
       return;
     }
-    
+
     // Create line item with beer details
     const lineItem: BeerOrderLineDto = {
       beerId: newLineItem.beerId,
@@ -133,24 +162,24 @@ const OrderFormPage = () => {
       beerStyle: selectedBeer.beerStyle,
       upc: selectedBeer.upc,
       orderQuantity: newLineItem.orderQuantity,
-      quantityAllocated: 0
+      quantityAllocated: 0,
     };
-    
+
     // Calculate total payment amount
     const lineItemTotal = selectedBeer.price * newLineItem.orderQuantity;
     const currentTotal = order.paymentAmount || 0;
-    
+
     // Add to order
     setOrder({
       ...order,
       beerOrderLines: [...(order.beerOrderLines || []), lineItem],
-      paymentAmount: currentTotal + lineItemTotal
+      paymentAmount: currentTotal + lineItemTotal,
     });
-    
+
     // Reset new line item
     setNewLineItem({
       beerId: undefined,
-      orderQuantity: 1
+      orderQuantity: 1,
     });
   };
 
@@ -158,41 +187,42 @@ const OrderFormPage = () => {
   const handleRemoveLineItem = (index: number) => {
     const lineItem = order.beerOrderLines?.[index];
     if (!lineItem || !lineItem.beerId) return;
-    
+
     // Find beer to calculate price reduction
-    const beer = beers.find(b => b.id === lineItem.beerId);
+    const beer = beers.find((b) => b.id === lineItem.beerId);
     if (!beer) return;
-    
+
     // Calculate new payment amount
     const lineItemTotal = beer.price * lineItem.orderQuantity;
     const currentTotal = order.paymentAmount || 0;
-    
+
     // Remove from order
     const newLines = [...(order.beerOrderLines || [])];
     newLines.splice(index, 1);
-    
+
     setOrder({
       ...order,
       beerOrderLines: newLines,
-      paymentAmount: currentTotal - lineItemTotal
+      paymentAmount: currentTotal - lineItemTotal,
     });
   };
 
   // Validate the form
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     // Customer reference validation
-    const customerRefError = required(order.customerRef) || minLength(3)(order.customerRef || '');
+    const customerRefError =
+      required(order.customerRef) || minLength(3)(order.customerRef || "");
     if (customerRefError) {
       newErrors.customerRef = customerRefError;
     }
-    
+
     // Line items validation
     if (!order.beerOrderLines || order.beerOrderLines.length === 0) {
-      newErrors.beerOrderLines = 'At least one beer must be added to the order';
+      newErrors.beerOrderLines = "At least one beer must be added to the order";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -200,38 +230,47 @@ const OrderFormPage = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      const newOrder = await BeerOrderService.createBeerOrder(order as BeerOrderDto);
-      toast.success('Order created successfully');
+      const newOrder = await BeerOrderService.createBeerOrder(
+        order as BeerOrderDto,
+      );
+      toast.success("Order created successfully");
       navigate(`/orders/${newOrder.id}`);
     } catch (err) {
-      console.error('Error creating order:', err);
-      
+      console.error("Error creating order:", err);
+
       // Handle API validation errors
       if (err instanceof Error) {
         try {
           const errorData = JSON.parse(err.message);
           if (errorData.fieldErrors) {
             const fieldErrors: Record<string, string> = {};
-            Object.entries(errorData.fieldErrors).forEach(([field, messages]) => {
-              fieldErrors[field] = Array.isArray(messages) ? messages[0] : messages as string;
-            });
+            Object.entries(errorData.fieldErrors).forEach(
+              ([field, messages]) => {
+                fieldErrors[field] = Array.isArray(messages)
+                  ? messages[0]
+                  : (messages as string);
+              },
+            );
             setErrors(fieldErrors);
           } else {
-            toast.error('Failed to create order: ' + (errorData.message || 'Unknown error'));
+            toast.error(
+              "Failed to create order: " +
+                (errorData.message || "Unknown error"),
+            );
           }
         } catch {
-          toast.error('Failed to create order. Please try again.');
+          toast.error("Failed to create order. Please try again.");
         }
       } else {
-        toast.error('Failed to create order. Please try again.');
+        toast.error("Failed to create order. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -240,9 +279,9 @@ const OrderFormPage = () => {
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
@@ -251,12 +290,12 @@ const OrderFormPage = () => {
       title="Create New Order"
       description="Create a new beer order"
       breadcrumbs={[
-        { label: 'Orders', to: '/orders' },
-        { label: 'New Order', to: '/orders/new' },
+        { label: "Orders", to: "/orders" },
+        { label: "New Order", to: "/orders/new" },
       ]}
       actions={
         <button
-          onClick={() => navigate('/orders')}
+          onClick={() => navigate("/orders")}
           className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 h-10 px-4 py-2"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -280,17 +319,19 @@ const OrderFormPage = () => {
                 value={selectedCustomer}
                 onChange={(e) => handleCustomerChange(e.target.value)}
                 options={[
-                  { value: '', label: 'Select a customer...' },
-                  ...customers.map(customer => ({
-                    value: customer.id?.toString() || '',
-                    label: customer.customerName
-                  }))
+                  { value: "", label: "Select a customer..." },
+                  ...(customers && customers.length > 0
+                    ? customers.map((customer) => ({
+                        value: customer.id?.toString() || "",
+                        label: customer.customerName,
+                      }))
+                    : []),
                 ]}
                 disabled={customersLoading}
                 required
               />
             </FormField>
-            
+
             <FormField
               id="customerRef"
               label="Customer Reference"
@@ -299,55 +340,58 @@ const OrderFormPage = () => {
             >
               <Input
                 id="customerRef"
-                value={order.customerRef || ''}
-                onChange={(e) => handleFieldChange('customerRef', e.target.value)}
+                value={order.customerRef || ""}
+                onChange={(e) =>
+                  handleFieldChange("customerRef", e.target.value)
+                }
                 error={!!errors.customerRef}
                 required
               />
             </FormField>
           </div>
         </div>
-        
+
         {/* Line Items */}
         <div className="bg-white p-6 rounded-lg border border-slate-200">
           <h2 className="text-lg font-semibold mb-4">Order Items</h2>
-          
+
           {/* Add New Item */}
           <div className="grid gap-4 md:grid-cols-3 mb-6">
-            <FormField
-              id="beerId"
-              label="Beer"
-              required
-            >
+            <FormField id="beerId" label="Beer" required>
               <Select
                 id="beerId"
-                value={newLineItem.beerId?.toString() || ''}
-                onChange={(e) => handleLineItemChange('beerId', parseInt(e.target.value, 10))}
+                value={newLineItem.beerId?.toString() || ""}
+                onChange={(e) =>
+                  handleLineItemChange("beerId", parseInt(e.target.value, 10))
+                }
                 options={[
-                  { value: '', label: 'Select a beer...' },
-                  ...beers.map(beer => ({
-                    value: beer.id?.toString() || '',
-                    label: `${beer.beerName} (${formatCurrency(beer.price)})`
-                  }))
+                  { value: "", label: "Select a beer..." },
+                  ...(beers && beers.length > 0
+                    ? beers.map((beer) => ({
+                        value: beer.id?.toString() || "",
+                        label: `${beer.beerName} (${formatCurrency(beer.price)})`,
+                      }))
+                    : []),
                 ]}
                 disabled={beersLoading}
               />
             </FormField>
-            
-            <FormField
-              id="orderQuantity"
-              label="Quantity"
-              required
-            >
+
+            <FormField id="orderQuantity" label="Quantity" required>
               <Input
                 id="orderQuantity"
                 type="number"
                 min="1"
                 value={newLineItem.orderQuantity || 1}
-                onChange={(e) => handleLineItemChange('orderQuantity', parseInt(e.target.value, 10))}
+                onChange={(e) =>
+                  handleLineItemChange(
+                    "orderQuantity",
+                    parseInt(e.target.value, 10),
+                  )
+                }
               />
             </FormField>
-            
+
             <div className="flex items-end">
               <button
                 type="button"
@@ -360,14 +404,14 @@ const OrderFormPage = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Error message */}
           {errors.beerOrderLines && (
             <div className="text-red-500 mb-4">{errors.beerOrderLines}</div>
           )}
-          
+
           {/* Line Items Table */}
-          {(!order.beerOrderLines || order.beerOrderLines.length === 0) ? (
+          {!order.beerOrderLines || order.beerOrderLines.length === 0 ? (
             <div className="text-center py-8 text-slate-500">
               No items added to this order yet. Add at least one beer above.
             </div>
@@ -386,7 +430,9 @@ const OrderFormPage = () => {
                 <TableBody>
                   {order.beerOrderLines.map((line, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-medium">{line.beerName}</TableCell>
+                      <TableCell className="font-medium">
+                        {line.beerName}
+                      </TableCell>
                       <TableCell>{line.beerStyle}</TableCell>
                       <TableCell>{line.upc}</TableCell>
                       <TableCell>{line.orderQuantity}</TableCell>
@@ -405,23 +451,29 @@ const OrderFormPage = () => {
                   ))}
                 </TableBody>
               </Table>
-              
+
               <div className="mt-4 flex justify-end">
                 <div className="bg-slate-50 p-4 rounded-md">
                   <span className="font-medium">Total Amount: </span>
-                  <span className="font-bold">{formatCurrency(order.paymentAmount || 0)}</span>
+                  <span className="font-bold">
+                    {formatCurrency(order.paymentAmount || 0)}
+                  </span>
                 </div>
               </div>
             </div>
           )}
         </div>
-        
+
         <div className="flex justify-end">
           <FormSubmitButton
             type="submit"
             isLoading={isSubmitting}
             loadingText="Creating..."
-            disabled={!order.customerRef || !order.beerOrderLines || order.beerOrderLines.length === 0}
+            disabled={
+              !order.customerRef ||
+              !order.beerOrderLines ||
+              order.beerOrderLines.length === 0
+            }
           >
             Create Order
           </FormSubmitButton>

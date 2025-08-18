@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {BeerOrderDto, BeerOrderStatus} from '../../types/beerOrder';
-import BeerOrderService from '../../services/beerOrderService';
-import {PageContainer} from '../../components/layout/PageContainer';
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import type {BeerOrderDto} from "../../types";
+import {BeerOrderStatus} from "../../types";
+import BeerOrderService from "../../services/beerOrderService";
+import PageContainer from "../../components/layout/PageContainer";
 import {
     Table,
     TableBody,
@@ -12,70 +13,72 @@ import {
     TableHeader,
     TableHeaderRow,
     TablePagination,
-    TableRow
-} from '../../components/ui/table';
-import {toast} from '../../components/ui/dialog';
-import {Pencil, Plus, Trash2, TruckIcon} from 'lucide-react';
+    TableRow,
+} from "../../components/ui/table";
+import {toast} from "../../components/ui/dialog";
+import {Pencil, Plus, Trash2, TruckIcon} from "lucide-react";
 
 const OrderListPage = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<BeerOrderDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
-  
+
   // Filter state
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<Record<string, unknown>>({});
 
   // Define filter options
   const filterOptions = [
     {
-      id: 'customerId',
-      label: 'Customer ID',
-      type: 'text'
+      id: "customerId",
+      label: "Customer ID",
+      type: "text",
     },
     {
-      id: 'status',
-      label: 'Order Status',
-      type: 'select',
+      id: "status",
+      label: "Order Status",
+      type: "select",
       options: Object.entries(BeerOrderStatus).map(([key, value]) => ({
         value: value,
-        label: key
-      }))
-    }
+        label: key,
+      })),
+    },
   ];
 
   // Load orders with pagination and filtering
   const loadOrders = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Convert 1-based pagination (UI) to 0-based (API)
       const pageNumber = currentPage - 1;
-      
+
       // Extract filter values
       const { customerId, status } = filters;
-      
+
       const response = await BeerOrderService.getBeerOrders(
-        pageNumber, 
-        pageSize, 
-        customerId, 
-        status as BeerOrderStatus
+        pageNumber,
+        pageSize,
+        customerId,
+        status as BeerOrderStatus,
       );
-      
+
       setOrders(response.content);
       setTotalPages(response.totalPages);
       setTotalItems(response.totalElements);
     } catch (err) {
-      setError('Failed to load orders. Please try again.');
-      console.error('Error loading orders:', err);
-      toast.error('Failed to load orders');
+      setError(
+        "No orders found. Try adjusting your filters or add a new order.",
+      );
+      console.error("Error loading orders:", err);
+      toast.error("Failed to load orders");
     } finally {
       setLoading(false);
     }
@@ -84,6 +87,7 @@ const OrderListPage = () => {
   // Load orders on mount and when pagination/filters change
   useEffect(() => {
     loadOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, pageSize, filters]);
 
   // Handle page change
@@ -98,14 +102,14 @@ const OrderListPage = () => {
   };
 
   // Handle filter change
-  const handleFilterChange = (newFilters: Record<string, any>) => {
+  const handleFilterChange = (newFilters: Record<string, unknown>) => {
     setFilters(newFilters);
     setCurrentPage(1); // Reset to first page when applying filters
   };
 
   // Handle order creation
   const handleCreateOrder = () => {
-    navigate('/orders/new');
+    navigate("/orders/new");
   };
 
   // Handle order edit
@@ -115,19 +119,19 @@ const OrderListPage = () => {
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
   // Format date
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -135,17 +139,17 @@ const OrderListPage = () => {
   const getStatusBadgeClass = (status: BeerOrderStatus) => {
     switch (status) {
       case BeerOrderStatus.NEW:
-        return 'bg-blue-100 text-blue-800';
+        return "bg-blue-100 text-blue-800";
       case BeerOrderStatus.PAID:
-        return 'bg-green-100 text-green-800';
+        return "bg-green-100 text-green-800";
       case BeerOrderStatus.INPROCESS:
-        return 'bg-yellow-100 text-yellow-800';
+        return "bg-yellow-100 text-yellow-800";
       case BeerOrderStatus.COMPLETE:
-        return 'bg-purple-100 text-purple-800';
+        return "bg-purple-100 text-purple-800";
       case BeerOrderStatus.CANCELLED:
-        return 'bg-red-100 text-red-800';
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -153,7 +157,7 @@ const OrderListPage = () => {
     <PageContainer
       title="Order Management"
       description="View, filter, and manage your beer orders"
-      breadcrumbs={[{ label: 'Orders', to: '/orders' }]}
+      breadcrumbs={[{ label: "Orders", to: "/orders" }]}
       actions={
         <button
           onClick={handleCreateOrder}
@@ -174,25 +178,15 @@ const OrderListPage = () => {
 
       {/* Order table */}
       {loading && <div className="py-10 text-center">Loading orders...</div>}
-      
-      {error && (
-        <div className="py-10 text-center text-red-500">
-          {error}
-          <button 
-            onClick={loadOrders}
-            className="ml-2 text-blue-500 hover:text-blue-700 underline"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-      
+
+      {error && <div className="py-10 text-center text-slate-500">{error}</div>}
+
       {!loading && !error && orders.length === 0 && (
         <div className="py-10 text-center text-slate-500">
           No orders found. Try adjusting your filters or create a new order.
         </div>
       )}
-      
+
       {!loading && !error && orders.length > 0 && (
         <Table>
           <TableHeader>
@@ -210,15 +204,17 @@ const OrderListPage = () => {
             {orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">#{order.id}</TableCell>
-                <TableCell>{order.customerRef || 'N/A'}</TableCell>
+                <TableCell>{order.customerRef || "N/A"}</TableCell>
                 <TableCell>{formatDate(order.createdDate)}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(order.status || BeerOrderStatus.NEW)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(order.status || BeerOrderStatus.NEW)}`}
+                  >
                     {order.status}
                   </span>
                 </TableCell>
                 <TableCell>{formatCurrency(order.paymentAmount)}</TableCell>
-                <TableCell>{order.beerOrderLines.length} items</TableCell>
+                <TableCell>{order.beerOrderLines?.length || 0} items</TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     <button

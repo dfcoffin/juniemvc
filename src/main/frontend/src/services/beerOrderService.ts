@@ -1,5 +1,23 @@
-import {apiService} from '../api/axiosConfig';
-import {BeerOrderDto, BeerOrderPage, BeerOrderStatus} from '../types/beerOrder';
+import {apiService} from "../api/axiosConfig";
+import type {BeerOrderDto, BeerOrderPage} from "../types";
+import {BeerOrderStatus} from "../types";
+
+/**
+ * Ensures each beer order has beerOrderLines initialized as an array
+ * @param orders - Array of beer orders to normalize
+ * @returns The normalized beer orders
+ */
+const normalizeBeerOrders = (
+  orders: BeerOrderDto[] | undefined,
+): BeerOrderDto[] => {
+  if (!orders) {
+    return [];
+  }
+  return orders.map((order) => ({
+    ...order,
+    beerOrderLines: order.beerOrderLines || [],
+  }));
+};
 
 /**
  * Beer Order service for handling beer order-related API operations
@@ -17,9 +35,9 @@ export const BeerOrderService = {
     pageNumber: number = 0,
     pageSize: number = 25,
     customerId?: number,
-    status?: BeerOrderStatus
+    status?: BeerOrderStatus,
   ): Promise<BeerOrderPage> => {
-    const params: Record<string, any> = {
+    const params: Record<string, number | string | undefined> = {
       pageNumber,
       pageSize,
     };
@@ -27,7 +45,12 @@ export const BeerOrderService = {
     if (customerId) params.customerId = customerId;
     if (status) params.status = status;
 
-    return apiService.get<BeerOrderPage>('/api/v1/orders', { params });
+    return apiService
+      .get<BeerOrderPage>("/api/v1/beer-orders", { params })
+      .then((response) => ({
+        ...response,
+        content: normalizeBeerOrders(response.content),
+      }));
   },
 
   /**
@@ -36,7 +59,12 @@ export const BeerOrderService = {
    * @returns Promise with beer order data
    */
   getBeerOrderById: (id: number): Promise<BeerOrderDto> => {
-    return apiService.get<BeerOrderDto>(`/api/v1/orders/${id}`);
+    return apiService
+      .get<BeerOrderDto>(`/api/v1/beer-orders/${id}`)
+      .then((order) => ({
+        ...order,
+        beerOrderLines: order.beerOrderLines || [],
+      }));
   },
 
   /**
@@ -45,7 +73,12 @@ export const BeerOrderService = {
    * @returns Promise with the created beer order
    */
   createBeerOrder: (beerOrderDto: BeerOrderDto): Promise<BeerOrderDto> => {
-    return apiService.post<BeerOrderDto>('/api/v1/orders', beerOrderDto);
+    return apiService
+      .post<BeerOrderDto>("/api/v1/beer-orders", beerOrderDto)
+      .then((order) => ({
+        ...order,
+        beerOrderLines: order.beerOrderLines || [],
+      }));
   },
 
   /**
@@ -54,8 +87,16 @@ export const BeerOrderService = {
    * @param beerOrderDto - The updated beer order data
    * @returns Promise with the updated beer order
    */
-  updateBeerOrder: (id: number, beerOrderDto: BeerOrderDto): Promise<BeerOrderDto> => {
-    return apiService.put<BeerOrderDto>(`/api/v1/orders/${id}`, beerOrderDto);
+  updateBeerOrder: (
+    id: number,
+    beerOrderDto: BeerOrderDto,
+  ): Promise<BeerOrderDto> => {
+    return apiService
+      .put<BeerOrderDto>(`/api/v1/beer-orders/${id}`, beerOrderDto)
+      .then((order) => ({
+        ...order,
+        beerOrderLines: order.beerOrderLines || [],
+      }));
   },
 
   /**
@@ -64,7 +105,7 @@ export const BeerOrderService = {
    * @returns Promise with void
    */
   deleteBeerOrder: (id: number): Promise<void> => {
-    return apiService.delete<void>(`/api/v1/orders/${id}`);
+    return apiService.delete<void>(`/api/v1/beer-orders/${id}`);
   },
 
   /**
@@ -73,8 +114,18 @@ export const BeerOrderService = {
    * @param status - The new status
    * @returns Promise with the updated beer order
    */
-  updateBeerOrderStatus: (id: number, status: BeerOrderStatus): Promise<BeerOrderDto> => {
-    return apiService.patch<BeerOrderDto>(`/api/v1/orders/${id}/status`, { status });
+  updateBeerOrderStatus: (
+    id: number,
+    status: BeerOrderStatus,
+  ): Promise<BeerOrderDto> => {
+    return apiService
+      .patch<BeerOrderDto>(`/api/v1/beer-orders/${id}/status`, {
+        status,
+      })
+      .then((order) => ({
+        ...order,
+        beerOrderLines: order.beerOrderLines || [],
+      }));
   },
 
   /**
@@ -83,7 +134,7 @@ export const BeerOrderService = {
    * @returns Promise with the customer's beer orders
    */
   getCustomerBeerOrders: (customerId: number): Promise<BeerOrderPage> => {
-    return this.getBeerOrders(0, 25, customerId);
+    return BeerOrderService.getBeerOrders(0, 25, customerId);
   },
 
   /**
@@ -93,14 +144,22 @@ export const BeerOrderService = {
    * @returns Promise with the updated beer order
    */
   createBeerOrderShipment: (
-    orderId: number, 
-    shipmentData: { 
-      shipmentDate: string; 
-      carrier: string; 
+    orderId: number,
+    shipmentData: {
+      shipmentDate: string;
+      carrier: string;
       trackingNumber: string;
-    }
+    },
   ): Promise<BeerOrderDto> => {
-    return apiService.post<BeerOrderDto>(`/api/v1/orders/${orderId}/shipments`, shipmentData);
+    return apiService
+      .post<BeerOrderDto>(
+        `/api/v1/beer-orders/${orderId}/shipments`,
+        shipmentData,
+      )
+      .then((order) => ({
+        ...order,
+        beerOrderLines: order.beerOrderLines || [],
+      }));
   },
 
   /**
@@ -109,7 +168,12 @@ export const BeerOrderService = {
    * @returns Promise with the updated beer order
    */
   allocateBeerOrder: (orderId: number): Promise<BeerOrderDto> => {
-    return apiService.post<BeerOrderDto>(`/api/v1/orders/${orderId}/allocate`, {});
+    return apiService
+      .post<BeerOrderDto>(`/api/v1/beer-orders/${orderId}/allocate`, {})
+      .then((order) => ({
+        ...order,
+        beerOrderLines: order.beerOrderLines || [],
+      }));
   },
 
   /**
@@ -118,8 +182,13 @@ export const BeerOrderService = {
    * @returns Promise with the updated beer order
    */
   deallocateBeerOrder: (orderId: number): Promise<BeerOrderDto> => {
-    return apiService.post<BeerOrderDto>(`/api/v1/orders/${orderId}/deallocate`, {});
-  }
+    return apiService
+      .post<BeerOrderDto>(`/api/v1/beer-orders/${orderId}/deallocate`, {})
+      .then((order) => ({
+        ...order,
+        beerOrderLines: order.beerOrderLines || [],
+      }));
+  },
 };
 
 export default BeerOrderService;
