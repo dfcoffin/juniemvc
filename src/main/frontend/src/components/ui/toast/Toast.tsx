@@ -28,8 +28,8 @@ export const Toast: React.FC<ToastProps> = ({
   duration = 5000,
   onClose,
   // position is not used in this component, but kept for API consistency
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  position = "top-right",
+
+  // position = "top-right",
 }) => {
   const [isExiting, setIsExiting] = useState(false);
 

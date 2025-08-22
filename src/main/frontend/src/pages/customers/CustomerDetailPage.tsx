@@ -1,75 +1,15 @@
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import type {Customer, CustomerDto} from "@/types/customer";
+import type {BeerOrderDto} from "@/types/beerOrder";
 import CustomerService from "../../services/customerService";
 import PageContainer from "../../components/layout/PageContainer";
 import {ConfirmationDialog, toast} from "../../components/ui/dialog";
 import TabNavigation from "../../components/navigation/TabNavigation";
-import {ArrowLeft, Eye, Plus, Save, ShoppingCart, Trash2} from "lucide-react";
+import {ArrowLeft, Save, ShoppingCart, Trash2} from "lucide-react";
 import {FormField, FormSubmitButton, Input, Select,} from "../../components/ui/form";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableHeaderRow,
-    TableRow,
-} from "../../components/ui/table";
-
-// US states for dropdown
-const US_STATES = [
-  { value: "AL", label: "Alabama" },
-  { value: "AK", label: "Alaska" },
-  { value: "AZ", label: "Arizona" },
-  { value: "AR", label: "Arkansas" },
-  { value: "CA", label: "California" },
-  { value: "CO", label: "Colorado" },
-  { value: "CT", label: "Connecticut" },
-  { value: "DE", label: "Delaware" },
-  { value: "FL", label: "Florida" },
-  { value: "GA", label: "Georgia" },
-  { value: "HI", label: "Hawaii" },
-  { value: "ID", label: "Idaho" },
-  { value: "IL", label: "Illinois" },
-  { value: "IN", label: "Indiana" },
-  { value: "IA", label: "Iowa" },
-  { value: "KS", label: "Kansas" },
-  { value: "KY", label: "Kentucky" },
-  { value: "LA", label: "Louisiana" },
-  { value: "ME", label: "Maine" },
-  { value: "MD", label: "Maryland" },
-  { value: "MA", label: "Massachusetts" },
-  { value: "MI", label: "Michigan" },
-  { value: "MN", label: "Minnesota" },
-  { value: "MS", label: "Mississippi" },
-  { value: "MO", label: "Missouri" },
-  { value: "MT", label: "Montana" },
-  { value: "NE", label: "Nebraska" },
-  { value: "NV", label: "Nevada" },
-  { value: "NH", label: "New Hampshire" },
-  { value: "NJ", label: "New Jersey" },
-  { value: "NM", label: "New Mexico" },
-  { value: "NY", label: "New York" },
-  { value: "NC", label: "North Carolina" },
-  { value: "ND", label: "North Dakota" },
-  { value: "OH", label: "Ohio" },
-  { value: "OK", label: "Oklahoma" },
-  { value: "OR", label: "Oregon" },
-  { value: "PA", label: "Pennsylvania" },
-  { value: "RI", label: "Rhode Island" },
-  { value: "SC", label: "South Carolina" },
-  { value: "SD", label: "South Dakota" },
-  { value: "TN", label: "Tennessee" },
-  { value: "TX", label: "Texas" },
-  { value: "UT", label: "Utah" },
-  { value: "VT", label: "Vermont" },
-  { value: "VA", label: "Virginia" },
-  { value: "WA", label: "Washington" },
-  { value: "WV", label: "West Virginia" },
-  { value: "WI", label: "Wisconsin" },
-  { value: "WY", label: "Wyoming" },
-];
+import CustomerOrdersTab from "../../components/customers/CustomerOrdersTab";
+import {US_STATES} from "@/utils/constants.ts";
 
 const CustomerDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -105,7 +45,10 @@ const CustomerDetailPage = () => {
       }
     };
 
-    loadCustomer();
+    // Properly handle the Promise
+    loadCustomer().catch(err => {
+      console.error("Unhandled error in loadCustomer:", err);
+    });
   }, [id]);
 
   // Handle edit toggle
@@ -402,7 +345,9 @@ const CustomerDetailPage = () => {
                         <h3 className="text-sm font-medium text-slate-500">
                           Name
                         </h3>
-                        <p className="mt-1 text-lg" data-testid="customer-name">{customer.name}</p>
+                        <p className="mt-1 text-lg" data-testid="customer-name">
+                          {customer.name}
+                        </p>
                       </div>
                       <div>
                         <h3 className="text-sm font-medium text-slate-500">
@@ -493,78 +438,7 @@ const CustomerDetailPage = () => {
               </div>
             );
           } else if (tabId === "orders") {
-            return (
-              <div className="mt-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">Beer Orders</h3>
-                  <button
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-slate-900 text-slate-50 hover:bg-slate-900/90 h-9 px-3"
-                    onClick={() =>
-                      navigate(`/orders/new?customerId=${customer.id}`)
-                    }
-                  >
-                    <Plus className="mr-1 h-4 w-4" />
-                    New Order
-                  </button>
-                </div>
-
-                {customer.beerOrders && customer.beerOrders.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableHeaderRow>
-                        <TableHead>Order ID</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Items</TableHead>
-                        <TableHead className="w-24">Actions</TableHead>
-                      </TableHeaderRow>
-                    </TableHeader>
-                    <TableBody>
-                      {customer.beerOrders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell className="font-medium">
-                            {order.id}
-                          </TableCell>
-                          <TableCell>{formatDate(order.createdDate)}</TableCell>
-                          <TableCell>
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                order.orderStatus === "READY"
-                                  ? "bg-green-100 text-green-800"
-                                  : order.orderStatus === "PENDING_INVENTORY"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : order.orderStatus === "PICKED_UP"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : "bg-slate-100 text-slate-800"
-                              }`}
-                            >
-                              {order.orderStatus}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            {order.beerOrderLines?.length || 0} items
-                          </TableCell>
-                          <TableCell>
-                            <button
-                              onClick={() => navigate(`/orders/${order.id}`)}
-                              className="p-2 text-slate-700 hover:text-slate-900"
-                              title="View Order"
-                            >
-                              <Eye className="h-4 w-4" />
-                              <span className="sr-only">View</span>
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="text-center py-10 text-slate-500">
-                    No orders found for this customer.
-                  </div>
-                )}
-              </div>
-            );
+            return <CustomerOrdersTab customer={customer} />;
           }
           return null;
         }}

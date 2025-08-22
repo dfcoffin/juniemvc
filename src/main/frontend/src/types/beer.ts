@@ -2,6 +2,8 @@
  * Beer types definitions
  */
 
+import type {Page} from "./common";
+
 /**
  * Beer style enumeration
  */
@@ -37,31 +39,7 @@ export interface Beer {
 /**
  * Beer page interface for paginated responses
  */
-export interface BeerPage {
-  content: Beer[];
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-    sort: {
-      empty: boolean;
-      sorted: boolean;
-      unsorted: boolean;
-    };
-  };
-  totalPages: number;
-  totalElements: number;
-  last: boolean;
-  size: number;
-  number: number;
-  sort: {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
-  };
-  numberOfElements: number;
-  first: boolean;
-  empty: boolean;
-}
+export type BeerPage = Page<Beer>;
 
 /**
  * Beer DTO for creating/updating beers

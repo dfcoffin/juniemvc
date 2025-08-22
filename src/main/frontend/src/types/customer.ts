@@ -3,6 +3,7 @@
  */
 
 import type {BeerOrderDto} from "./beerOrder";
+import type {Page} from "./common";
 
 /**
  * Customer interface representing a customer entity
@@ -27,31 +28,7 @@ export interface Customer {
 /**
  * Customer page interface for paginated responses
  */
-export interface CustomerPage {
-  content: Customer[];
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-    sort: {
-      empty: boolean;
-      sorted: boolean;
-      unsorted: boolean;
-    };
-  };
-  totalPages: number;
-  totalElements: number;
-  last: boolean;
-  size: number;
-  number: number;
-  sort: {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
-  };
-  numberOfElements: number;
-  first: boolean;
-  empty: boolean;
-}
+export type CustomerPage = Page<Customer>;
 
 /**
  * Customer DTO for creating/updating customers

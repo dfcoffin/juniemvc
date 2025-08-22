@@ -1,23 +1,6 @@
 import {apiService} from "../api/axiosConfig";
-import type {BeerOrderDto, BeerOrderPage} from "../types";
-import {BeerOrderStatus} from "../types";
-
-/**
- * Ensures each beer order has beerOrderLines initialized as an array
- * @param orders - Array of beer orders to normalize
- * @returns The normalized beer orders
- */
-const normalizeBeerOrders = (
-  orders: BeerOrderDto[] | undefined,
-): BeerOrderDto[] => {
-  if (!orders) {
-    return [];
-  }
-  return orders.map((order) => ({
-    ...order,
-    beerOrderLines: order.beerOrderLines || [],
-  }));
-};
+import type {BeerOrderDto, BeerOrderPage} from "@/types/beerOrder";
+import {BeerOrderStatus} from "@/types/beerOrder";
 
 /**
  * Beer Order service for handling beer order-related API operations
@@ -45,12 +28,7 @@ export const BeerOrderService = {
     if (customerId) params.customerId = customerId;
     if (status) params.status = status;
 
-    return apiService
-      .get<BeerOrderPage>("/api/v1/beer-orders", { params })
-      .then((response) => ({
-        ...response,
-        content: normalizeBeerOrders(response.content),
-      }));
+    return apiService.get<BeerOrderPage>("/api/v1/beer-orders", { params });
   },
 
   /**
@@ -59,12 +37,7 @@ export const BeerOrderService = {
    * @returns Promise with beer order data
    */
   getBeerOrderById: (id: number): Promise<BeerOrderDto> => {
-    return apiService
-      .get<BeerOrderDto>(`/api/v1/beer-orders/${id}`)
-      .then((order) => ({
-        ...order,
-        beerOrderLines: order.beerOrderLines || [],
-      }));
+    return apiService.get<BeerOrderDto>(`/api/v1/beer-orders/${id}`);
   },
 
   /**
@@ -73,12 +46,7 @@ export const BeerOrderService = {
    * @returns Promise with the created beer order
    */
   createBeerOrder: (beerOrderDto: BeerOrderDto): Promise<BeerOrderDto> => {
-    return apiService
-      .post<BeerOrderDto>("/api/v1/beer-orders", beerOrderDto)
-      .then((order) => ({
-        ...order,
-        beerOrderLines: order.beerOrderLines || [],
-      }));
+    return apiService.post<BeerOrderDto>("/api/v1/beer-orders", beerOrderDto);
   },
 
   /**
@@ -91,12 +59,10 @@ export const BeerOrderService = {
     id: number,
     beerOrderDto: BeerOrderDto,
   ): Promise<BeerOrderDto> => {
-    return apiService
-      .put<BeerOrderDto>(`/api/v1/beer-orders/${id}`, beerOrderDto)
-      .then((order) => ({
-        ...order,
-        beerOrderLines: order.beerOrderLines || [],
-      }));
+    return apiService.put<BeerOrderDto>(
+      `/api/v1/beer-orders/${id}`,
+      beerOrderDto,
+    );
   },
 
   /**
@@ -118,14 +84,9 @@ export const BeerOrderService = {
     id: number,
     status: BeerOrderStatus,
   ): Promise<BeerOrderDto> => {
-    return apiService
-      .patch<BeerOrderDto>(`/api/v1/beer-orders/${id}/status`, {
-        status,
-      })
-      .then((order) => ({
-        ...order,
-        beerOrderLines: order.beerOrderLines || [],
-      }));
+    return apiService.patch<BeerOrderDto>(`/api/v1/beer-orders/${id}/status`, {
+      status,
+    });
   },
 
   /**
@@ -151,15 +112,10 @@ export const BeerOrderService = {
       trackingNumber: string;
     },
   ): Promise<BeerOrderDto> => {
-    return apiService
-      .post<BeerOrderDto>(
-        `/api/v1/beer-orders/${orderId}/shipments`,
-        shipmentData,
-      )
-      .then((order) => ({
-        ...order,
-        beerOrderLines: order.beerOrderLines || [],
-      }));
+    return apiService.post<BeerOrderDto>(
+      `/api/v1/beer-orders/${orderId}/shipments`,
+      shipmentData,
+    );
   },
 
   /**
@@ -168,12 +124,10 @@ export const BeerOrderService = {
    * @returns Promise with the updated beer order
    */
   allocateBeerOrder: (orderId: number): Promise<BeerOrderDto> => {
-    return apiService
-      .post<BeerOrderDto>(`/api/v1/beer-orders/${orderId}/allocate`, {})
-      .then((order) => ({
-        ...order,
-        beerOrderLines: order.beerOrderLines || [],
-      }));
+    return apiService.post<BeerOrderDto>(
+      `/api/v1/beer-orders/${orderId}/allocate`,
+      {},
+    );
   },
 
   /**
@@ -182,12 +136,10 @@ export const BeerOrderService = {
    * @returns Promise with the updated beer order
    */
   deallocateBeerOrder: (orderId: number): Promise<BeerOrderDto> => {
-    return apiService
-      .post<BeerOrderDto>(`/api/v1/beer-orders/${orderId}/deallocate`, {})
-      .then((order) => ({
-        ...order,
-        beerOrderLines: order.beerOrderLines || [],
-      }));
+    return apiService.post<BeerOrderDto>(
+      `/api/v1/beer-orders/${orderId}/deallocate`,
+      {},
+    );
   },
 };
 

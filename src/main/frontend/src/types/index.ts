@@ -2,6 +2,9 @@
  * Re-export all types from type files
  */
 
+// Import common types
+import type {Page, Pageable, Sort} from "./common";
+
 // Import Beer types
 import type {Beer, BeerDto, BeerPage, BeerPatchDto} from "./beer";
 import {BeerStyle} from "./beer";
@@ -15,6 +18,12 @@ import {BeerOrderStatus} from "./beerOrder";
 
 // Re-export all types
 export type {
+  // Common types
+  Page,
+  Pageable,
+  Sort,
+
+  // Domain types
   Beer,
   BeerDto,
   BeerPage,
@@ -30,7 +39,3 @@ export type {
 };
 
 export { BeerStyle, BeerOrderStatus };
-
-// Export non-enum types as values as well to satisfy imports
-// This is needed because some files are importing these types without the 'type' keyword
-export { Beer, BeerOrderDto, BeerOrderLineDto, BeerOrderPage, Customer };

@@ -1,9 +1,24 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {render, screen, waitFor} from "@testing-library/react";
+import {render, screen, waitFor} from "../../../test/test-utils";
 import OrderFormPage from "../OrderFormPage";
 import {apiService} from "../../../api/axiosConfig";
-import {BrowserRouter} from "react-router-dom";
 import {mockBeerPage, mockCustomerPage} from "../../../test/mocks/api-mocks";
+
+// Mock toast to prevent initialization errors
+vi.mock("../../../components/ui/dialog", async () => {
+  const actual = await import("../../../components/ui/dialog");
+  return {
+    ...actual,
+    toast: {
+      success: vi.fn(),
+      error: vi.fn(),
+      info: vi.fn(),
+      warning: vi.fn(),
+    },
+    initializeToast: vi.fn(),
+    useInitializeToast: vi.fn(),
+  };
+});
 
 // Mock the API service
 vi.mock("../../../api/axiosConfig", () => ({
@@ -46,11 +61,7 @@ describe("OrderFormPage", () => {
     });
 
     // Render the component
-    render(
-      <BrowserRouter>
-        <OrderFormPage />
-      </BrowserRouter>,
-    );
+    render(<OrderFormPage />);
 
     // Verify loading state first
     expect(screen.getByText(/Select a customer/i)).toBeInTheDocument();
@@ -101,11 +112,7 @@ describe("OrderFormPage", () => {
     });
 
     // Render the component
-    render(
-      <BrowserRouter>
-        <OrderFormPage />
-      </BrowserRouter>,
-    );
+    render(<OrderFormPage />);
 
     // Wait for API calls to complete
     await waitFor(() => {
@@ -146,11 +153,7 @@ describe("OrderFormPage", () => {
     });
 
     // Render the component
-    render(
-      <BrowserRouter>
-        <OrderFormPage />
-      </BrowserRouter>,
-    );
+    render(<OrderFormPage />);
 
     // Wait for API calls to complete
     await waitFor(() => {

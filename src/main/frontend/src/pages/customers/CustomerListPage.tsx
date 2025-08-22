@@ -31,9 +31,15 @@ const CustomerListPage = () => {
 
   // Filter state
   const [filters, setFilters] = useState<Record<string, unknown>>({});
+  // Explicit type for filters to avoid TS2322 error
 
-  // Define filter options
-  const filterOptions = [
+  // Define filter options with proper type constraint for the TableFilter component
+  const filterOptions: Array<{
+    id: string;
+    label: string;
+    type: "text" | "select" | "date" | "boolean";
+    options?: { value: string; label: string }[];
+  }> = [
     {
       id: "name",
       label: "Customer Name",
@@ -63,32 +69,19 @@ const CustomerListPage = () => {
       // Extract filter values
       const { name } = filters;
 
-      // Always make a fresh API call to ensure latest data
       const response = await CustomerService.getCustomers(
         pageNumber,
         pageSize,
-        name,
+        name as string | undefined,
       );
 
-      // Check if response and response.content are defined before updating state
-      if (response && response.content && Array.isArray(response.content)) {
-        setCustomers(response.content);
-        setTotalPages(response.totalPages || 0);
-        setTotalItems(response.totalElements || 0);
-      } else {
-        setCustomers([]);
-        setTotalPages(0);
-        setTotalItems(0);
-        console.error("Received invalid response format from API", response);
-      }
+      setCustomers(response.content);
+      setTotalPages(response.totalPages);
+      setTotalItems(response.totalElements);
     } catch (err) {
       setError("Failed to load customers. Please try again.");
       console.error("Error loading customers:", err);
       toast.error("Failed to load customers");
-      // Clear customers data in case of error
-      setCustomers([]);
-      setTotalPages(0);
-      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -124,24 +117,11 @@ const CustomerListPage = () => {
 
   // Handle customer edit
   const handleEditCustomer = (id: number) => {
-    if (id) {
-      navigate(`/customers/${id}`);
-    }
+    navigate(`/customers/${id}`);
   };
 
   // Format address
   const formatAddress = (customer: Customer) => {
-    // If any of the required address fields are undefined, return an empty string
-    if (
-      !customer ||
-      !customer.addressLine1 ||
-      !customer.city ||
-      !customer.state ||
-      !customer.postalCode
-    ) {
-      return "";
-    }
-
     const address = [
       customer.addressLine1,
       customer.addressLine2,
@@ -191,13 +171,13 @@ const CustomerListPage = () => {
         </div>
       )}
 
-      {!loading && !error && customers && customers.length === 0 && (
+      {!loading && !error && customers.length === 0 && (
         <div className="py-10 text-center text-slate-500">
           No customers found. Try adjusting your filters or add a new customer.
         </div>
       )}
 
-      {!loading && !error && customers && customers.length > 0 && (
+      {!loading && !error && customers.length > 0 && (
         <Table>
           <TableHeader>
             <TableHeaderRow>

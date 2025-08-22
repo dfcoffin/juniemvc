@@ -2,6 +2,8 @@
  * Beer Order types definitions
  */
 
+import type {Page} from "./common";
+
 /**
  * Beer Order Line interface
  */
@@ -61,28 +63,4 @@ export interface BeerOrderDto {
 /**
  * Beer Order page interface for paginated responses
  */
-export interface BeerOrderPage {
-  content: BeerOrderDto[];
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-    sort: {
-      empty: boolean;
-      sorted: boolean;
-      unsorted: boolean;
-    };
-  };
-  totalPages: number;
-  totalElements: number;
-  last: boolean;
-  size: number;
-  number: number;
-  sort: {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
-  };
-  numberOfElements: number;
-  first: boolean;
-  empty: boolean;
-}
+export type BeerOrderPage = Page<BeerOrderDto>;

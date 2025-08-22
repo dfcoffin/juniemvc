@@ -88,7 +88,7 @@ describe("CustomerDetailPage", () => {
 
     // Check customer details are displayed
     expect(screen.getByText("john@example.com")).toBeInTheDocument();
-    
+
     // Phone number doesn't need to be checked since it may be displayed as N/A
 
     // API should have been called
