@@ -24,23 +24,7 @@ export const CustomerService = {
 
     if (name) params.name = name;
 
-    return apiService
-      .get<CustomerPage>("/api/v1/customers", { params })
-      .then((response) => {
-        // Handle response and make sure both name and customerName properties are set
-        if (response && response.content && Array.isArray(response.content)) {
-          response.content = response.content.map((customer) => {
-            // Ensure both name and customerName are set correctly
-            if (customer.customerName && !customer.name) {
-              customer.name = customer.customerName;
-            } else if (customer.name && !customer.customerName) {
-              customer.customerName = customer.name;
-            }
-            return customer;
-          });
-        }
-        return response;
-      });
+    return apiService.get<CustomerPage>('/api/v1/customers', { params });
   },
 
   /**
@@ -68,23 +52,7 @@ export const CustomerService = {
    * @returns Promise with the created customer
    */
   createCustomer: (customerDto: CustomerDto): Promise<Customer> => {
-    // Ensure both name properties are consistent in the DTO
-    const dto = { ...customerDto };
-    if (dto.name) {
-      dto.customerName = dto.name;
-    }
-
-    return apiService
-      .post<Customer>("/api/v1/customers", dto)
-      .then((customer) => {
-        // Ensure both name and customerName are set correctly in the response
-        if (customer.customerName && !customer.name) {
-          customer.name = customer.customerName;
-        } else if (customer.name && !customer.customerName) {
-          customer.customerName = customer.name;
-        }
-        return customer;
-      });
+    return apiService.post<Customer>('/api/v1/customers', customerDto);
   },
 
   /**
@@ -119,29 +87,8 @@ export const CustomerService = {
    * @param customerPatchDto - The partial customer data to update
    * @returns Promise with the updated customer
    */
-  patchCustomer: (
-    id: number,
-    customerPatchDto: CustomerPatchDto,
-  ): Promise<Customer> => {
-    // Ensure both name properties are consistent in the DTO
-    const dto = { ...customerPatchDto };
-    if (dto.name && !dto.customerName) {
-      dto.customerName = dto.name;
-    } else if (dto.customerName && !dto.name) {
-      dto.name = dto.customerName;
-    }
-
-    return apiService
-      .patch<Customer>(`/api/v1/customers/${id}`, dto)
-      .then((customer) => {
-        // Ensure both name and customerName are set correctly in the response
-        if (customer.customerName && !customer.name) {
-          customer.name = customer.customerName;
-        } else if (customer.name && !customer.customerName) {
-          customer.customerName = customer.name;
-        }
-        return customer;
-      });
+  patchCustomer: (id: number, customerPatchDto: CustomerPatchDto): Promise<Customer> => {
+    return apiService.patch<Customer>(`/api/v1/customers/${id}`, customerPatchDto);
   },
 
   /**

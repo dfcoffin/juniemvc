@@ -177,44 +177,8 @@ const CustomerFormPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Check for duplicate customers first
-      const existingCustomers = await CustomerService.getCustomers(
-        0,
-        100,
-        customer.name,
-      );
-
-      // If customers with same name exist, prevent creation
-      if (
-        existingCustomers &&
-        existingCustomers.content &&
-        existingCustomers.content.some(
-          (c) =>
-            c.name.toLowerCase() === customer.name.toLowerCase() ||
-            (c.customerName &&
-              c.customerName.toLowerCase() === customer.name.toLowerCase()),
-        )
-      ) {
-        // Set a validation error instead of a confirmation dialog
-        setErrors({
-          name: `A customer with the name "${customer.name}" already exists. Please use a different name.`,
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Create the customer only if no duplicates
       const newCustomer = await CustomerService.createCustomer(customer);
       toast.success("Customer created successfully");
-
-      // Force refresh of customer data in all pages
-      try {
-        // Attempt to refresh the customer list in the background
-        await CustomerService.getCustomers(0, 100);
-      } catch (refreshErr) {
-        console.error("Error refreshing customer data:", refreshErr);
-      }
-
       navigate(`/customers/${newCustomer.id}`);
     } catch (err) {
       console.error("Error creating customer:", err);
