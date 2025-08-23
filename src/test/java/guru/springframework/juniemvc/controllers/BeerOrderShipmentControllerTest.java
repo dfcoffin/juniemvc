@@ -1,55 +1,62 @@
 package guru.springframework.juniemvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import guru.springframework.juniemvc.models.BeerOrderShipmentDto;
 import guru.springframework.juniemvc.services.BeerOrderService;
 import guru.springframework.juniemvc.services.BeerOrderShipmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Tests for BeerOrderShipmentController
  */
-@WebMvcTest(BeerOrderShipmentController.class)
+@ExtendWith(MockitoExtension.class)
 class BeerOrderShipmentControllerTest {
 
-    @Autowired
     MockMvc mockMvc;
 
-    @Autowired
-    ObjectMapper objectMapper;
+    ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
-    @MockBean
+    @Mock
     BeerOrderShipmentService beerOrderShipmentService;
 
-    @MockBean
+    @Mock
     BeerOrderService beerOrderService;
+    
+    @InjectMocks
+    BeerOrderShipmentController beerOrderShipmentController;
 
     BeerOrderShipmentDto testShipment;
     LocalDateTime testShipmentDate;
 
     @BeforeEach
     void setUp() {
+        // Initialize MockMvc
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(beerOrderShipmentController)
+                .build();
+                
         // Create test shipment date
         testShipmentDate = LocalDateTime.now();
 

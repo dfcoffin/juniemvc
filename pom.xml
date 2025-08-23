@@ -205,6 +205,16 @@
 					</filesets>
 				</configuration>
 			</plugin>
+			
+			<!-- Surefire Plugin Configuration -->
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>
+						-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.17.0/mockito-core-5.17.0.jar
+					</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
